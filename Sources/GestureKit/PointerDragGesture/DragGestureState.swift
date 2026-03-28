@@ -5,6 +5,7 @@
 //  Created by Dave Coleman on 14/1/2026.
 //
 
+import InteractionPrimitives
 import SwiftUI
 
 /// Internal state machine for ``PointerDragModifier``.
@@ -47,20 +48,20 @@ extension DragGestureState {
       case .marquee:
         return .rect(
           from: .init(fromPoint: gestureValue.startLocation),
-          current: .init(fromPoint: gestureValue.location)
+          current: .init(fromPoint: gestureValue.location),
         )
 
       case .continuous(let axes):
         let prev = previousGestureTranslation ?? .zero
         let rawDelta = CGSize(
           width: gestureValue.translation.width - prev.width,
-          height: gestureValue.translation.height - prev.height
+          height: gestureValue.translation.height - prev.height,
         )
         let constrained = applyAxis(axes, delta: rawDelta)
         previousGestureTranslation = gestureValue.translation
         return .delta(
           .init(fromCGSize: constrained),
-          location: .init(fromPoint: gestureValue.location)
+          location: .init(fromPoint: gestureValue.location),
         )
 
       case .none:
@@ -78,7 +79,7 @@ extension DragGestureState {
   /// Zeroes out movement on locked axes.
   private func applyAxis(
     _ axes: Axis.Set,
-    delta: CGSize
+    delta: CGSize,
   ) -> CGSize {
     switch axes {
       case .horizontal: CGSize(width: delta.width, height: 0)
