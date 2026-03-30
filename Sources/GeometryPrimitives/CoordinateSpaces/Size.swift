@@ -41,9 +41,9 @@ extension Size {
 }
 
 extension CGSize {
-  package var screenSize: Size<ScreenSpace> { .init(fromCGSize: self) }
+  public var screenSize: Size<ScreenSpace> { .init(fromCGSize: self) }
 
-  package init<Space>(fromSize size: Size<Space>) {
+  public init<Space>(fromSize size: Size<Space>) {
     self.init(width: size.width, height: size.height)
   }
 }

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import InteractionPrimitives
 
 public struct TransientInteraction<Value: Sendable & Equatable>: Sendable, Equatable {
   public var value: Value?

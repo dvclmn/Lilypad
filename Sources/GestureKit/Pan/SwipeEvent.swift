@@ -6,6 +6,7 @@
 //
 
 import InteractionPrimitives
+import GeometryPrimitives
 
 /// Note: This size comes as deltas, which will need to be accrued
 /// Modifiers == 'modifiers held'

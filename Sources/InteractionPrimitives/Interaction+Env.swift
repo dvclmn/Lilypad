@@ -22,4 +22,6 @@ extension EnvironmentValues {
     return zoomLevel.clampedIfNeeded(to: zoomRange)
   }
   
+  @Entry public var pointerStyle: PointerStyleCompatible?
+  
 }

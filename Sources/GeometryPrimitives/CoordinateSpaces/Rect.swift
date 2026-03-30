@@ -76,5 +76,5 @@ extension Rect {
 }
 
 extension CGRect {
-  package var screenRect: Rect<ScreenSpace> { .init(fromRect: self) }
+  public var screenRect: Rect<ScreenSpace> { .init(fromRect: self) }
 }

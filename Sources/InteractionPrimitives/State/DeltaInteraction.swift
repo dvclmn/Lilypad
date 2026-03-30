@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import InteractionPrimitives
+import GeometryPrimitives
 
 extension ContinuousInteraction where Value == Size<ScreenSpace> {
   public mutating func updateDelta(

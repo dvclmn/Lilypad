@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GeometryPrimitives
 
 /// This is an improvement over the previous CGRect, which was
 /// trying to wear too many hats
