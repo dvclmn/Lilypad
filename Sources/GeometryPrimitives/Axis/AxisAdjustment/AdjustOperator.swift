@@ -28,13 +28,3 @@ public prefix func + <T: AdditiveArithmetic>(rhs: T) -> Operation<T> {
 public prefix func * <T: Numeric>(rhs: T) -> Operation<T> {
   Operation { $0 * rhs }
 }
-
-//extension AxisKeyPathWritable {
-//  public func adjust(
-//    using operation: Operation<Component>,
-//    along axis: GridAxis,
-//    mapping: AxisMapping = .default
-//  ) -> Self {
-//    adjust(axis, mapping: mapping, operation.apply)
-//  }
-//}

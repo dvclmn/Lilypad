@@ -58,7 +58,7 @@ public enum PointerStyleCompatible: Sendable {
 
   case frameResize(
     position: FrameResizePositionCompatible,
-    directions: FrameResizeDirectionCompatible = .all
+    directions: FrameResizeDirectionCompatible = .all,
   )
   case image(Image, hotSpot: UnitPoint)
 
@@ -90,7 +90,7 @@ extension PointerStyleCompatible {
       case .frameResize(let position, let direction):
         .frameResize(
           position: position.toResizePosition,
-          directions: direction.toResizeDirection
+          directions: direction.toResizeDirection,
         )
 
       case .image(let image, let hotSpot): .image(image, hotSpot: hotSpot)
@@ -119,4 +119,31 @@ extension PointerStyleCompatible {
       case .image(let image, let hotSpot): "Image: \(image), \(hotSpot)"
     }
   }
+}
+
+extension UnitPoint {
+
+  public var toCompatPointerStyle: PointerStyleCompatible? {
+    guard let position = self.toCompatFrameResizePosition else { return nil }
+    let style = PointerStyleCompatible.frameResize(
+      position: position,
+      directions: .all,
+    )
+    return style
+  }
+
+  var toCompatFrameResizePosition: FrameResizePositionCompatible? {
+    switch self {
+      case .topLeading: .topLeading
+      case .topTrailing: .topTrailing
+      case .bottomLeading: .bottomLeading
+      case .bottomTrailing: .bottomTrailing
+      case .top: .top
+      case .trailing: .trailing
+      case .leading: .leading
+      case .bottom: .bottom
+      default: nil
+    }
+  }
+
 }

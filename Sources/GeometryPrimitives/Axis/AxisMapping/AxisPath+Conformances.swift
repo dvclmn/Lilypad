@@ -36,17 +36,6 @@ extension EdgeInsets: AxisKeyPathWritable {
   public static var secondaryWritableKey: WritableKeyPath<Self, CGFloat> { \.verticalUniform }
 }
 
-// MARK: - Index-based conformace
-extension GridPosition: AxisKeyPathWritable {
-  public static var primaryWritableKey: WritableKeyPath<Self, Int> { \.column }
-  public static var secondaryWritableKey: WritableKeyPath<Self, Int> { \.row }
-}
-
-extension GridDimensions: AxisKeyPathWritable {
-  public static var primaryWritableKey: WritableKeyPath<Self, Int> { \.width }
-  public static var secondaryWritableKey: WritableKeyPath<Self, Int> { \.height }
-}
-
 //extension GridAxis: AxisKeyPathReadable {
 //  public static var primaryKey: KeyPath<Self, Void> { \Self.Cases.horizontal }
 //  public static var secondaryKey: KeyPath<Self, Void> { \Self.Cases.vertical }
