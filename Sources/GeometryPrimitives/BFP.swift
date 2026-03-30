@@ -8,7 +8,7 @@
 import Foundation
 
 extension BinaryFloatingPoint {
-  
+
   /// Keeps line width visually consistent across zoom levels.
   /// Optically, lines can feel slightly heavier at small zoom levels,
   /// and thinner when zoomed in close. Use `sensitivity`
@@ -26,32 +26,32 @@ extension BinaryFloatingPoint {
       return self
     }
     let effectiveZoom = range.map { zoom.clamped(to: $0) } ?? zoom
-    
+
     if let sensitivity {
       let s = sensitivity.clamped(to: 0...1)
       return self * Self(pow(Double(effectiveZoom), Double(s - 1)))
     }
-    
+
     return self / effectiveZoom
   }
-  
+
   public func clampedIfNeeded(to range: ClosedRange<Self>?) -> Self {
     guard let range else { return self }
     return clamped(to: range)
     //    return isFinite ? self.clamped(to: range) : self
   }
-  
+
   public func clamped(to range: ClosedRange<Self>) -> Self {
     let lower = range.lowerBound
     let upper = range.upperBound
-    
+
     guard lower < upper else { return self }
     return Swift.min(upper, Swift.max(lower, self))
-    
+
     //    return clamped(range.lowerBound, range.upperBound)
   }
-  
-  public var isFiniteAndGreaterThanZero: Bool {
-    isFinite && self > 0
-  }
+
+  public var isGreaterThanZero: Bool { self > 0 }
+  public var isFiniteAndGreaterThanZero: Bool { isFinite && self > 0 }
+  public var isGreaterThanOrEqualToZero: Bool { self >= 0 }
 }
