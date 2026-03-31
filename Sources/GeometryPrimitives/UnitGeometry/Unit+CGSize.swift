@@ -16,22 +16,11 @@ extension CGSize {
     along axis: GridAxis,
     using unitSize: CGSize,
     mapping: AxisMapping = .default,
-    rounding: GridRounding = .down
+    rounding: GridRounding = .down,
   ) -> Int? {
     /// Ensures the same convention is used for extracting both length values
     let lengthOfSelf = self.value(along: axis, mapping: mapping)
     let unitLength = unitSize.value(along: axis, mapping: mapping)
     return lengthOfSelf.toGridCount(using: unitLength, rounding: rounding)
   }
-
-
 }
-
-//extension Optional where Wrapped == CGSize {
-//  public func gridLength(
-//    _ count: Int,
-//    along axis: GridAxis,
-//  ) -> CGFloat? {
-//    return count.toScreenLength(along: axis, using: self)
-//  }
-//}

@@ -27,7 +27,7 @@ let package = Package(
       name: "InteractionPrimitives",
       dependencies: [
         .product(name: "BaseMacros", package: "BaseMacros"),
-        .module(.geometryPrimitives)
+        .module(.geometryPrimitives),
       ],
     ),
     .target(
@@ -37,12 +37,13 @@ let package = Package(
       ],
     ),
     .target(
-      name: "GeometryPrimitives",
+      name: "GeometryPrimitives"
     ),
     .target(
       name: "LilyPad",
       dependencies: [
-        .module(.interactionPrimitives)
+        .module(.interactionPrimitives),
+        .module(.geometryPrimitives),
       ],
     ),
     .testTarget(

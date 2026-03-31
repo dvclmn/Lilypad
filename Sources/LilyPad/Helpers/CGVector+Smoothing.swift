@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GeometryPrimitives
 
 extension CGVector {
 
@@ -22,16 +23,16 @@ extension CGVector {
       dt: deltaTime,
     )
 
-    let dx = (smoothed.dx * (1 - factor)) + (raw.dx * factor)
-    let dy = (smoothed.dy * (1 - factor)) + (raw.dy * factor)
-
-    return CGVector(
-      dx: dx,
-      dy: dy,
-    )
-    //    return smoothed.adjustBoth(with: raw) { _, prev, next in
-    //      (prev * (1 - factor)) + (next * factor)
-    //    }
+    //    let dx = (smoothed.dx * (1 - factor)) + (raw.dx * factor)
+    //    let dy = (smoothed.dy * (1 - factor)) + (raw.dy * factor)
+    //
+    //    return CGVector(
+    //      dx: dx,
+    //      dy: dy,
+    //    )
+    return smoothed.adjustBoth(with: raw) { _, prev, next in
+      (prev * (1 - factor)) + (next * factor)
+    }
 
   }
 
@@ -44,19 +45,4 @@ extension CGVector {
     let delta = (current - previous) / deltaTime
     return CGVector(dx: delta.x, dy: delta.y)
   }
-}
-
-public func - (lhs: CGPoint, rhs: CGPoint) -> CGPoint {
-  return CGPoint(
-    x: lhs.x - rhs.x,
-    y: lhs.y - rhs.y
-  )
-}
-
-public func / (lhs: CGPoint, rhs: CGFloat) -> CGPoint {
-  precondition(rhs != 0 && rhs != 0, "Cannot divide by zero size")
-  return CGPoint(
-    x: lhs.x / rhs,
-    y: lhs.y / rhs
-  )
 }

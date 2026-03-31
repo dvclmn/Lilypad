@@ -29,23 +29,20 @@ extension Axis {
     self == .vertical
   }
 
-  public func getMinMax(_ axis: Axis.MinMax, mapping: AxisMapping = .default) -> Axis {
+  public func getMinMax(
+    _ axis: Axis.MinMax,
+    mapping: AxisMapping = .default,
+  ) -> Axis {
     switch mapping {
       case .identity:
         switch axis {
-          case .minWidth, .maxWidth:
-            return .horizontal
-
-          case .minHeight, .maxHeight:
-            return .vertical
+          case .minWidth, .maxWidth: .horizontal
+          case .minHeight, .maxHeight: .vertical
         }
       case .transposed:
         switch axis {
-          case .minWidth, .maxWidth:
-            return .vertical
-
-          case .minHeight, .maxHeight:
-            return .horizontal
+          case .minWidth, .maxWidth: .vertical
+          case .minHeight, .maxHeight: .horizontal
         }
     }
 
