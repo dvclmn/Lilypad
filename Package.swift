@@ -26,7 +26,7 @@ let package = Package(
     .target(
       name: "InteractionPrimitives",
       dependencies: [
-        .product(name: "BaseMacros", package: "BaseMacros"),
+        .extDependency(.enumMacros),
         .module(.geometryPrimitives),
       ],
     ),
@@ -54,8 +54,14 @@ let package = Package(
 )
 
 extension Target.Dependency {
-  static func module(_ baseModule: InternalModule) -> Self {
-    .target(name: baseModule.name)
+  static func module(_ name: InternalModule) -> Self {
+    .target(name: name.name)
+  }
+  static func extDependency(_ dependency: ExternalDependency) -> Self {
+    .product(
+      name: dependency.reference.0,
+      package: dependency.reference.1 ?? dependency.reference.0,
+    )
   }
 }
 extension String { static let baseHelpers = "BaseHelpers" }
@@ -68,6 +74,16 @@ enum InternalModule {
     switch self {
       case .interactionPrimitives: ("InteractionPrimitives")
       case .geometryPrimitives: ("GeometryPrimitives")
+    }
+  }
+}
+
+enum ExternalDependency {
+  case enumMacros
+
+  var reference: (String, String?) {
+    switch self {
+      case .enumMacros: ("BaseMacros", nil)
     }
   }
 }
