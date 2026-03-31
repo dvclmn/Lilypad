@@ -36,7 +36,7 @@ extension EdgeInsets: AxisKeyPathWritable {
   public static var secondaryWritableKey: WritableKeyPath<Self, CGFloat> { \.verticalUniform }
 }
 
-//extension GridAxis: AxisKeyPathReadable {
+//extension GeometryAxis: AxisKeyPathReadable {
 //  public static var primaryKey: KeyPath<Self, Void> { \Self.Cases.horizontal }
 //  public static var secondaryKey: KeyPath<Self, Void> { \Self.Cases.vertical }
 //}

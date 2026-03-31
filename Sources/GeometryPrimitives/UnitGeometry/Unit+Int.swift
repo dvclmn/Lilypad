@@ -52,7 +52,7 @@ extension Int {
 
 extension Int {
   public func toScreenLength(
-    along axis: GridAxis,
+    along axis: GeometryAxis,
     mapping: AxisMapping = .default,
     using unitSize: CGSize,
     policy: ConversionSafetyPolicy = .assertDebug
@@ -62,7 +62,7 @@ extension Int {
   }
 
   public func toScreenLengthIfPossible(
-    along axis: GridAxis,
+    along axis: GeometryAxis,
     mapping: AxisMapping = .default,
     using unitSize: CGSize?,
     policy: ConversionSafetyPolicy = .checkOnly

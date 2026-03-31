@@ -61,7 +61,7 @@ extension Alignment: AxisOrientable {
 extension AxisMapping {
   /// Returns the physical Edge for a logical direction.
   /// - Parameter isPositive: `true` for trailing/bottom (max), `false` for leading/top (min).
-  public func edge(for axis: GridAxis, isPositive: Bool) -> Edge {
+  public func edge(for axis: GeometryAxis, isPositive: Bool) -> Edge {
     let physicalAxis = self.map(axis)
     switch (physicalAxis, isPositive) {
       case (.horizontal, false): return .leading

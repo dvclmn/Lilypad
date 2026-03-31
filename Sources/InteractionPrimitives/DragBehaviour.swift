@@ -5,6 +5,7 @@
 //  Created by Dave Coleman on 14/1/2026.
 //
 
+import GeometryPrimitives
 import SwiftUI
 
 /// Defines the drag interaction mode applied by ``PointerDragModifier``.
@@ -23,9 +24,9 @@ public enum DragBehavior: Equatable, Sendable {
   /// An accumulated offset that persists across drag gestures.
   ///
   /// Each new drag begins from the offset committed by the previous drag, so
-  /// movement compounds over time. Pass a ``GridAxis/Set`` to lock to an axis.
-  case continuous(axes: Axis.Set)
-//  case continuous(axes: GridAxis.Set)
+  /// movement compounds over time. Pass a ``GeometryAxis/Set`` to lock to an axis.
+//  case continuous(axes: Axis.Set)
+  case continuous(axes: GeometryAxis.Set)
 
   /// Drag gesture is inactive; no callbacks or state changes are produced.
   case none
@@ -45,7 +46,8 @@ extension DragBehavior {
   }
 
   /// The axis constraint for continuous drags. Returns `.all` for other modes.
-  public var axes: Axis.Set {
+  public var axes: GeometryAxis.Set {
+//  public var axes: Axis.Set {
     if case .continuous(let axes) = self { return axes }
     return .all
   }

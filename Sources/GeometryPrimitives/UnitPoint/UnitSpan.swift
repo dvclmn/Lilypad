@@ -33,7 +33,7 @@ extension Axis {
     mapping.select(
       primary: UnitSpan(start: .leading, end: .trailing),  // “primary is horizontal”
       secondary: UnitSpan(start: .top, end: .bottom),  // “secondary is vertical”
-      for: self.toGridAxis,
+      for: self.toGeometryAxis,
     )
   }
 

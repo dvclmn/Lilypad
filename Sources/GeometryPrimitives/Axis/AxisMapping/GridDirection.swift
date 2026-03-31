@@ -15,7 +15,7 @@ public enum GridDirection {
 
 extension AxisMapping {
   /// Maps a logical direction (Start/Center/End) to a physical SwiftUI Alignment component.
-  public func alignmentComponent(for axis: GridAxis, direction: GridDirection) -> Any {
+  public func alignmentComponent(for axis: GeometryAxis, direction: GridDirection) -> Any {
     let physicalAxis = self.map(axis)
     switch (physicalAxis, direction) {
       case (.horizontal, .start): return HorizontalAlignment.leading

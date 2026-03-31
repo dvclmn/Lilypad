@@ -11,7 +11,7 @@ import SwiftUI
 ///
 /// Conforming types (for example `CGPoint` (x/y), `CGSize` (width/height), `UnitPoint`,
 /// and `CGVector`) gain ergonomic helpers for reading and writing values along a
-/// `GridAxis` while honoring an `AxisMapping` (identity vs. transposed).
+/// `GeometryAxis` while honoring an `AxisMapping` (identity vs. transposed).
 ///
 /// Use these APIs when the usual assumptions (x → horizontal, y → vertical) don't always
 /// hold. By threading an explicit `AxisMapping`, you can write axis-oriented code that
@@ -44,7 +44,7 @@ extension AxisKeyPathWritable {
     transform: (_ lhs: Component, _ rhs: Component) -> Component
   ) -> Self where Other.Component == Component {
     var result = self
-    for axis in [GridAxis.horizontal, .vertical] {
+    for axis in [GeometryAxis.horizontal, .vertical] {
       let lhs = self.value(along: axis, mapping: mapping)
       let rhs = other.value(along: axis, mapping: mapping)
       let newValue = transform(lhs, rhs)
@@ -53,24 +53,24 @@ extension AxisKeyPathWritable {
     return result
   }
 
-  /// Component-wise combination where the transform also receives the `GridAxis` being processed.
+  /// Component-wise combination where the transform also receives the `GeometryAxis` being processed.
   ///
   /// Useful when the horizontal and vertical axes should be treated differently.
   public func adjustBoth<Other: AxisKeyPathWritable>(
     with other: Other,
-    transform: (_ axis: GridAxis, _ lhs: Component, _ rhs: Component) -> Component
+    transform: (_ axis: GeometryAxis, _ lhs: Component, _ rhs: Component) -> Component
   ) -> Self where Other.Component == Component {
     return self.adjustBoth(with: other, mapping: .default, transform: transform)
   }
 
-  /// Mapping-aware variant: component-wise combination where the transform also receives the `GridAxis`.
+  /// Mapping-aware variant: component-wise combination where the transform also receives the `GeometryAxis`.
   public func adjustBoth<Other: AxisKeyPathWritable>(
     with other: Other,
     mapping: AxisMapping = .default,
-    transform: (_ axis: GridAxis, _ lhs: Component, _ rhs: Component) -> Component
+    transform: (_ axis: GeometryAxis, _ lhs: Component, _ rhs: Component) -> Component
   ) -> Self where Other.Component == Component {
     var result = self
-    for axis in [GridAxis.horizontal, .vertical] {
+    for axis in [GeometryAxis.horizontal, .vertical] {
       let lhs = self.value(along: axis, mapping: mapping)
       let rhs = other.value(along: axis, mapping: mapping)
       let newValue = transform(axis, lhs, rhs)
@@ -82,7 +82,7 @@ extension AxisKeyPathWritable {
 
 // MARK: Axis-aware single-axis adjustments
 
-/// Helpers to read/modify a single component along a given `GridAxis`, optionally
+/// Helpers to read/modify a single component along a given `GeometryAxis`, optionally
 /// using an `AxisMapping` to resolve which stored component is considered horizontal
 /// or vertical for the current context.
 extension AxisKeyPathWritable {
@@ -101,7 +101,7 @@ extension AxisKeyPathWritable {
   /// ```
   /// You can pass `mapping: .transposed` to flip which stored field is touched.
   public func adjust(
-    _ axis: GridAxis,
+    _ axis: GeometryAxis,
     newValue: Component,
     mapping: AxisMapping = .default
   ) -> Self {
@@ -119,7 +119,7 @@ extension AxisKeyPathWritable {
   /// let shifted = point.adjust(.horizontal) { $0 + 10 } // x: 15, y: 8
   /// ```
   public func adjust(
-    _ axis: GridAxis,
+    _ axis: GeometryAxis,
     mapping: AxisMapping = .default,
     _ transform: (Component) -> Component,
   ) -> Self {
@@ -181,7 +181,7 @@ extension AxisKeyPathWritable where Component: BinaryFloatingPoint {
   public func adjustBoth(
     using op: (Component, Component) -> Component,
     with other: Self,
-    along axis: GridAxis,
+    along axis: GeometryAxis,
     mapping: AxisMapping = .default
   ) -> Self {
     let factor = other.value(along: axis, mapping: mapping)
@@ -222,7 +222,7 @@ extension AxisKeyPathWritable where Component: BinaryFloatingPoint {
   /// The axis-to-storage relationship is resolved using `mapping`.
   public func multiplyBoth(
     by factorProvider: Self,
-    using axis: GridAxis,
+    using axis: GeometryAxis,
     mapping: AxisMapping = .default
   ) -> Self {
     let factor = factorProvider.value(along: axis, mapping: mapping)
@@ -253,7 +253,7 @@ extension AxisKeyPathWritable where Component: BinaryFloatingPoint {
   /// If the selected divisor is zero or non-finite, returns a value with both axes set to zero.
   public func divideBoth(
     by divisorProvider: Self,
-    using axis: GridAxis,
+    using axis: GeometryAxis,
     mapping: AxisMapping = .default
   ) -> Self {
     let divisor = divisorProvider.value(along: axis, mapping: mapping)
@@ -283,7 +283,7 @@ extension AxisKeyPathWritable where Component: BinaryFloatingPoint {
   /// Returns `nil` if the selected divisor is zero or non-finite. On success, results are clamped to zero.
   public func dividingBothExactly(
     by divisorProvider: Self,
-    using axis: GridAxis,
+    using axis: GeometryAxis,
     mapping: AxisMapping = .default
   ) -> Self? {
     let divisor = divisorProvider.value(along: axis, mapping: mapping)

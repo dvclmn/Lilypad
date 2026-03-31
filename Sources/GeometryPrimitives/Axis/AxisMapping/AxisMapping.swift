@@ -40,7 +40,7 @@ public enum AxisMapping: Sendable {
   /// Selects either `primary` or `secondary` based on `axis` and the current mapping.
   /// With `.identity`, `.horizontal` selects `primary` and `.vertical` selects `secondary`.
   /// With `.transposed`, this selection is flipped.
-  public func select<T>(primary: T, secondary: T, for axis: GridAxis) -> T {
+  public func select<T>(primary: T, secondary: T, for axis: GeometryAxis) -> T {
     switch (self, axis) {
       case (.identity, .horizontal), (.transposed, .vertical): return primary
       case (.identity, .vertical), (.transposed, .horizontal): return secondary
@@ -57,7 +57,7 @@ public enum AxisMapping: Sendable {
   }
 
   /// Transforms a logical axis into a physical axis based on the mapping.
-  public func map(_ axis: GridAxis) -> GridAxis {
+  public func map(_ axis: GeometryAxis) -> GeometryAxis {
     switch (self, axis) {
       case (.identity, let a): return a
       case (.transposed, .horizontal): return .vertical
@@ -65,9 +65,9 @@ public enum AxisMapping: Sendable {
     }
   }
 
-  /// Converts a physical axis (SwiftUI.Axis) into your logical GridAxis.
-  public func map(_ swiftUIAxis: Axis) -> GridAxis {
-    let gridAxis = swiftUIAxis.toGridAxis
+  /// Converts a physical axis (SwiftUI.Axis) into your logical GeometryAxis.
+  public func map(_ swiftUIAxis: Axis) -> GeometryAxis {
+    let gridAxis = swiftUIAxis.toGeometryAxis
     return map(gridAxis)
 
   }

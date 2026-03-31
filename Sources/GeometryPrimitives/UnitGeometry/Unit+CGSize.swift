@@ -13,7 +13,7 @@ extension CGSize {
   /// `CGSize`, so need to address a specific dimension, based on
   /// the appropriate convention via `AxisMapping`
   public func toGridCount(
-    along axis: GridAxis,
+    along axis: GeometryAxis,
     using unitSize: CGSize,
     mapping: AxisMapping = .default,
     rounding: GridRounding = .down,

@@ -19,7 +19,7 @@ public protocol AxisKeyPathWritable: AxisKeyPathReadable {
 
 //  func setting(
 //    _ newValue: Component,
-//    along axis: GridAxis,
+//    along axis: GeometryAxis,
 //    mapping: AxisMapping
 //  ) -> Self
 }
@@ -31,7 +31,7 @@ extension AxisKeyPathWritable {
 
   public func setting(
     _ newValue: Component,
-    along axis: GridAxis,
+    along axis: GeometryAxis,
     mapping: AxisMapping = .default
   ) -> Self {
     var copy = self

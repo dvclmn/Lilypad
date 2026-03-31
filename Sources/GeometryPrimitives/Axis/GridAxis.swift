@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// Note: `GridAxis` is about how indices progress across the grid,
+/// Note: `GeometryAxis` is about how indices progress across the grid,
 /// not about how the things themselves are shaped.
 ///
 /// Even though a column is (in my brain) usually a 'vertical thing', in
@@ -24,7 +24,7 @@ import SwiftUI
 ///
 /// ```
 //@CasePathable
-public enum GridAxis: String, Sendable, Codable, Equatable, Hashable, CaseIterable, Identifiable {
+public enum GeometryAxis: String, Sendable, Codable, Equatable, Hashable, CaseIterable, Identifiable {
   case horizontal  // Column
   case vertical  // Row
 
@@ -33,10 +33,10 @@ public enum GridAxis: String, Sendable, Codable, Equatable, Hashable, CaseIterab
 
 }
 
-extension GridAxis: CustomStringConvertible {
+extension GeometryAxis: CustomStringConvertible {
   public var description: String { name }
 }
-extension GridAxis {
+extension GeometryAxis {
   public struct Set: OptionSet, Sendable, Hashable {
     public init(rawValue: Int) {
       self.rawValue = rawValue
@@ -49,7 +49,7 @@ extension GridAxis {
   }
 }
 
-extension GridAxis.Set {
+extension GeometryAxis.Set {
   public var name: String {
     let nameH = "Horizontal"
     let nameV = "Vertical"
@@ -66,10 +66,10 @@ extension GridAxis.Set {
   }
 }
 
-extension GridAxis {
+extension GeometryAxis {
   public var id: String { rawValue }
 
-  public var toSet: GridAxis.Set {
+  public var toSet: GeometryAxis.Set {
     switch self {
       case .horizontal: [.horizontal]
       case .vertical: [.vertical]
@@ -163,7 +163,7 @@ extension GridAxis {
 }
 
 /// Metadata
-extension GridAxis {
+extension GeometryAxis {
 
   public var name: String {
     switch self {
@@ -194,7 +194,7 @@ extension GridAxis {
 
 }
 
-extension GridAxis {
+extension GeometryAxis {
   public var toSwiftUIAxis: Axis {
     switch self {
       case .horizontal: .horizontal
@@ -204,7 +204,7 @@ extension GridAxis {
 }
 
 extension Axis {
-  public var toGridAxis: GridAxis {
+  public var toGeometryAxis: GeometryAxis {
     switch self {
       case .horizontal: .horizontal
       case .vertical: .vertical
