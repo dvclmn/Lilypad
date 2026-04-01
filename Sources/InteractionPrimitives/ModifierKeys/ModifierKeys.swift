@@ -5,25 +5,56 @@
 //  Created by Dave Coleman on 23/7/2024.
 //
 
-import EnumMacros
+//import EnumMacros
 import SwiftUI
 
-/// A representation of Modifier keys that doesn't use SwiftUI or AppKit
-@SetOfOptions<Int>
-public struct Modifiers: Sendable, Hashable {
-  public enum Options: Int, CaseIterable, Identifiable, Hashable, Equatable {
-    case shift
-    case option
-    case command
-    case control
-    case capsLock
-    case numericPad
+public struct Modifiers: OptionSet, Sendable, Hashable {
+  public init(rawValue: Int) {
+    self.rawValue = rawValue
   }
+  public let rawValue: Int
+
+  public static let shift = Self(rawValue: 1 << 0)
+  public static let option = Self(rawValue: 1 << 1)
+  public static let command = Self(rawValue: 1 << 2)
+  public static let control = Self(rawValue: 1 << 3)
+  public static let capsLock = Self(rawValue: 1 << 4)
+  public static let numericPad = Self(rawValue: 1 << 5)
+
+  public static let all: Self = [
+    .shift,
+    .option,
+    .command,
+    .control,
+    .capsLock,
+    .numericPad,
+  ]
+
+  //  public static let all: Self = [
+  //    .swipe,
+  //    .pinch,
+  //    .pointerHover,
+  //    .pointerTap,
+  //    .pointerDrag
+  //  ]
 }
 
-extension Modifiers.Options {
-  public var id: Int { rawValue }
-}
+/// A representation of Modifier keys that doesn't use SwiftUI or AppKit
+//@SetOfOptions<Int>
+//public struct Modifiers: Sendable, Hashable {
+//  public enum Options: Int, CaseIterable, Identifiable, Hashable, Equatable {
+//    case shift
+//    case option
+//    case command
+//    case control
+//    case capsLock
+//    case numericPad
+//  }
+//}
+
+//extension Modifiers.Options {
+//  public var id: Int { rawValue }
+//}
 
 extension Modifiers {
   #if canImport(AppKit)

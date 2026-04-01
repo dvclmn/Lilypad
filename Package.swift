@@ -18,16 +18,16 @@ let package = Package(
       ],
     )
   ],
-  dependencies: [
-    .package(url: "https://github.com/dvclmn/BaseMacros", branch: "main")
-  ],
+  //  dependencies: [
+  //    .package(url: "https://github.com/dvclmn/BaseMacros", branch: "main")
+  //  ],
 
   targets: [
     .target(
       name: "InteractionPrimitives",
       dependencies: [
-        .extDependency(.enumMacros),
-        .module(.geometryPrimitives),
+        //        .extDependency(.enumMacros),
+        .module(.geometryPrimitives)
       ],
     ),
     .target(
@@ -57,12 +57,12 @@ extension Target.Dependency {
   static func module(_ name: InternalModule) -> Self {
     .target(name: name.name)
   }
-  static func extDependency(_ dependency: ExternalDependency) -> Self {
-    .product(
-      name: dependency.reference.0,
-      package: dependency.reference.1 ?? dependency.reference.0,
-    )
-  }
+  //  static func extDependency(_ dependency: ExternalDependency) -> Self {
+  //    .product(
+  //      name: dependency.reference.0,
+  //      package: dependency.reference.1 ?? dependency.reference.0,
+  //    )
+  //  }
 }
 extension String { static let baseHelpers = "BaseHelpers" }
 
@@ -78,12 +78,12 @@ enum InternalModule {
   }
 }
 
-enum ExternalDependency {
-  case enumMacros
-
-  var reference: (String, String?) {
-    switch self {
-      case .enumMacros: ("BaseMacros", nil)
-    }
-  }
-}
+//enum ExternalDependency {
+//  case enumMacros
+//
+//  var reference: (String, String?) {
+//    switch self {
+//      case .enumMacros: ("BaseMacros", nil)
+//    }
+//  }
+//}
