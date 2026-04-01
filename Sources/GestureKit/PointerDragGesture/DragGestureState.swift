@@ -23,7 +23,7 @@ import SwiftUI
 ///   values directly from `DragGesture.Value`. All state is cleared on end.
 struct DragGestureState {
 
-  var behaviour: DragBehavior?
+  var behaviour: DragBehavior = .none
 
   /// For continuous mode: the previous `DragGesture.Value.translation`,
   /// used to compute the frame-to-frame delta. `nil` on first frame.
@@ -44,7 +44,7 @@ extension DragGestureState {
   mutating func update(
     _ gestureValue: DragGesture.Value
   ) -> PointerDragPayload? {
-    guard let behaviour else { return nil }
+
     switch behaviour {
       case .marquee:
         return .rect(
@@ -75,12 +75,9 @@ extension DragGestureState {
     previousGestureTranslation = nil
   }
 
-  // MARK: - Axis constraint
-
   /// Zeroes out movement on locked axes.
   private func applyAxis(
     _ axes: GeometryAxis.Set,
-//    _ axes: Axis.Set,
     delta: CGSize,
   ) -> CGSize {
     switch axes {

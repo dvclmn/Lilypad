@@ -47,7 +47,6 @@ extension DragBehavior {
 
   /// The axis constraint for continuous drags. Returns `.all` for other modes.
   public var axes: GeometryAxis.Set {
-//  public var axes: Axis.Set {
     if case .continuous(let axes) = self { return axes }
     return .all
   }
