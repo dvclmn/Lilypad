@@ -9,24 +9,29 @@ import Foundation
 
 extension BinaryFloatingPoint {
 
-  /// Only for if `self` is in normalised [0,1] space
-  //  public func removingZoomNormalised(_ zoom: Self) -> Self {
-  //    guard zoom >= 0 else { return self }
-  //    return self / (1 + zoom)
-  //  }
+  /// Multiplicative zoom factor: 1.0 == no zoom, 2.0 == 200%
+  public func removingZoomFactor(_ factor: Self) -> Self {
+    guard factor.isFinite, factor != 0 else { return self }
+    return self / factor
+  }
+
+  /// Normalized zoom in 0...1 mapped to [1, maxFactor]
+  public func removingZoomNormalised(
+    _ normalised: Self,
+    maxFactor: Self = 2,
+  ) -> Self {
+    let clamped = normalised.clamped(to: 0...1)
+    let factor = 1 + clamped * (maxFactor - 1)
+    return self / factor
+  }
 
   /// Only for if `self` is a percent (0–100):
   public func removingZoomPercent(_ percent: Self) -> Self {
+    precondition(percent >= 0 && percent <= 100, "Expects a 0...100 percent value, received: \(percent)")
+
     let normalised = percent / 100
     return self / (1 + normalised)
   }
-  
-  
-
-  //  public func removingZoomPercent(_ zoomPercent: Self) -> Self {
-  //    let result = Double(self) / pow(1 + Double(zoomPercent), 1)
-  //    return Self(result)
-  //  }
 
   /// Keeps line width visually consistent across zoom levels.
   /// Optically, lines can feel slightly heavier at small zoom levels,
@@ -39,7 +44,7 @@ extension BinaryFloatingPoint {
   public func removingZoom(
     _ zoom: Self,
     across range: ClosedRange<Self>? = nil,
-    sensitivity: Self? = nil
+    sensitivity: Self? = nil,
   ) -> Self {
     guard zoom.isGreaterThanZero, range?.isGreaterThanZero ?? false else {
       return self
@@ -69,7 +74,7 @@ extension BinaryFloatingPoint {
     in range: ClosedRange<Double>,
     lowSensitivityThreshold: Double = 1.0,
     highSensitivityThreshold: Double = 5.0,
-    curve: Double = 1.5
+    curve: Double = 1.5,
   ) -> Double {
 
     guard range.isGreaterThanZero,
@@ -130,7 +135,7 @@ extension BinaryFloatingPoint {
   public static func simpleNonLinearZoomScale(
     _ zoom: Double,
     range: ClosedRange<Double>,
-    sensitivity: Double = 1.3
+    sensitivity: Double = 1.3,
   ) -> Double {
     guard sensitivity > 0 else { return zoom }
     let normalised = zoom.normalised(in: range)
@@ -142,7 +147,7 @@ extension BinaryFloatingPoint {
   func slowResponse(_ x: Self) -> Self {
     Self(pow(CGFloat(x), CGFloat(self)))
   }
-  
+
   /// Where self is the curve
   func fastResponse(_ x: Self) -> Self {
     Self(pow(CGFloat(x), CGFloat(1 / self)))
