@@ -11,36 +11,25 @@ public struct CoordinateSpaceMapper {
   public let canvasSize: Size<CanvasSpace>
   public let artworkFrame: Rect<ScreenSpace>
   public let zoom: Double
-  //  public let geometry: CanvasGeometry
-  //  public let transform: TransformState
   public let zoomRange: ClosedRange<Double>?
 
   public init(
     canvasSize: Size<CanvasSpace>,
     artworkFrame: Rect<ScreenSpace>,
     zoom: CGFloat,
-    //    geometry: CanvasGeometry,
-    //    transform: TransformState,
     zoomRange: ClosedRange<Double>?,
   ) {
     self.canvasSize = canvasSize
     self.artworkFrame = artworkFrame
     self.zoom = zoom
-    //    self.geometry = geometry
-    //    self.transform = transform
     self.zoomRange = zoomRange
   }
 }
 
 extension CoordinateSpaceMapper {
-  //  private var canvasSize: Size<CanvasSpace> { geometry.canvasSize }
-  //  private var artworkFrame: Rect<ScreenSpace> { geometry.artworkFrameInViewport }
   private var zoomClamped: CGFloat {
-    //    guard zoom.isFinite && zoom > 0 else { return 1 }
     guard zoom.isFiniteAndGreaterThanZero else { return 1 }
-    //        guard transform.scale.isFiniteAndGreaterThanZero else { return 1 }
     return zoom.clampedIfNeeded(to: zoomRange)
-    //    return transform.scale.clampedIfNeeded(to: zoomRange)
   }
 
   /// Convert screen-space point to canvas-space
