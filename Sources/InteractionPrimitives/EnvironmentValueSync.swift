@@ -7,25 +7,7 @@
 
 import SwiftUI
 
-private struct EnvironmentSyncModifier<Value: Equatable>: ViewModifier {
-
-  @Environment private var value: Value
-  let apply: (Value) -> Void
-
-  init(
-    _ keyPath: KeyPath<EnvironmentValues, Value>,
-    apply: @escaping (Value) -> Void,
-  ) {
-    _value = Environment(keyPath)
-    self.apply = apply
-  }
-
-  func body(content: Content) -> some View {
-    content.task(id: value) { apply(value) }
-  }
-}
-
-private struct EnvironmentSyncModifierByID<Value, ID: Equatable>: ViewModifier {
+private struct EnvironmentSyncModifier<Value, ID: Equatable>: ViewModifier {
 
   @Environment private var value: Value
   let id: (Value) -> ID
@@ -77,12 +59,11 @@ extension View {
   ///     myStore.updateKeys(newKeys)
   ///   }
   /// ```
-
   public func syncEnvironment<Value: Equatable>(
     _ keyPath: KeyPath<EnvironmentValues, Value>,
     apply: @escaping (Value) -> Void,
   ) -> some View {
-    modifier(EnvironmentSyncModifier(keyPath, apply: apply))
+    modifier(EnvironmentSyncModifier(keyPath, id: { $0 }, apply: apply))
   }
 
   public func syncEnvironment<Value, ID: Equatable>(
@@ -91,22 +72,11 @@ extension View {
     apply: @escaping (Value) -> Void,
   ) -> some View {
     modifier(
-      EnvironmentSyncModifierByID(
+      EnvironmentSyncModifier(
         keyPath,
         id: { $0[keyPath: idKeyPath] },
         apply: apply,
       )
     )
   }
-
-  //  public func syncModifiers(
-  //    apply: @escaping (Modifiers) -> Void
-  //  ) -> some View {
-  //    syncEnvironment(\.modifierKeys, apply: apply)
-  //  }
-
-  //  public func syncModifiers(to binding: Binding<Modifiers>) -> some View {
-  //    syncModifiers { binding.wrappedValue = $0 }
-  //  }
-
 }
