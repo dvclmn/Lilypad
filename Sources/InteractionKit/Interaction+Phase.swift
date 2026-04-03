@@ -5,8 +5,8 @@
 //  Created by Dave Coleman on 9/1/2026.
 //
 
-import SwiftUI
 import AppKit
+import SwiftUI
 
 /// Based on `NSEvent.Phase`
 public enum InteractionPhase: String, Sendable, Codable {
@@ -51,6 +51,7 @@ extension InteractionPhase {
 }
 
 extension InteractionPhase {
+  
   public init(from nsEventPhase: NSEvent.Phase) {
     self =
       switch nsEventPhase {
@@ -64,6 +65,14 @@ extension InteractionPhase {
       }
   }
 
+  public init(from nsTouch: NSTouch) {
+    if nsTouch.isResting {
+      self = .stationary
+    } else {
+      self.init(from: nsTouch.phase)
+    }
+  }
+
   public init(from nsTouchPhase: NSTouch.Phase) {
     self =
       switch nsTouchPhase {
@@ -75,5 +84,6 @@ extension InteractionPhase {
         case .touching: .mayBegin
         default: .none
       }
+
   }
 }

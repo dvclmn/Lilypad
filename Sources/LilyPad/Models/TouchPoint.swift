@@ -42,6 +42,8 @@ public struct TouchPoint: Identifiable, Hashable, Sendable {
   public let phase: InteractionPhase
 
   /// Whether this finger is stationary on the trackpad (resting, not moving).
+  /// Seems like an overlap with `phase`, but choosing to keep
+  /// as AppKit NSTouch has them separate
   public let isResting: Bool
 
   public init(

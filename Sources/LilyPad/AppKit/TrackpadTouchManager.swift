@@ -81,6 +81,7 @@ class TrackpadTouchManager {
       /// Update or clean up history
       if touch.phase == .ended || touch.phase == .cancelled {
         history.removeValue(forKey: id)
+
       } else {
         history[id] = TouchState(
           lastPosition: position,
