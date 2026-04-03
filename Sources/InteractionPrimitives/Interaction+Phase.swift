@@ -8,6 +8,7 @@
 import SwiftUI
 import AppKit
 
+/// Based on `NSEvent.Phase`
 public enum InteractionPhase: String, Sendable, Codable {
   case began
 
@@ -71,14 +72,6 @@ extension InteractionPhase {
         case .cancelled: .cancelled
         case .touching: .mayBegin
         default: .none
-      }
-  }
-
-  public init(fromHover hoverPhase: HoverPhase) {
-    self =
-      switch hoverPhase {
-        case .active: .changed
-        case .ended: .ended
       }
   }
 }

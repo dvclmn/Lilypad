@@ -47,7 +47,7 @@ extension VerticalDirectionCompatible {
 // MARK: - Conversions
 extension VerticalDirectionCompatible.Set {
   @available(macOS 15, *)
-  var toVerticalDirection: VerticalDirection.Set {
+  var verticalDirection: VerticalDirection.Set {
     var result: VerticalDirection.Set = []
     if self.contains(.up) { result.insert(.up) }
     if self.contains(.down) { result.insert(.down) }
@@ -57,7 +57,7 @@ extension VerticalDirectionCompatible.Set {
 
 extension HorizontalDirectionCompatible.Set {
   @available(macOS 15, *)
-  var toHorizontalDirection: HorizontalDirection.Set {
+  var horizontalDirection: HorizontalDirection.Set {
     var result: HorizontalDirection.Set = []
     if self.contains(.leading) { result.insert(.leading) }
     if self.contains(.trailing) { result.insert(.trailing) }

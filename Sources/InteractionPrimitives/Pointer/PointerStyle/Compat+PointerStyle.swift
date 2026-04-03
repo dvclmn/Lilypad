@@ -78,22 +78,17 @@ extension PointerStyleCompatible {
       case .link: .link
       case .zoomIn: .zoomIn
       case .zoomOut: .zoomOut
-
       case .columnResize: .columnResize
-      case .columnResizeDirections(let dir):
-        .columnResize(directions: dir.toHorizontalDirection)
-
+      case .columnResizeDirections(let dir): .columnResize(directions: dir.horizontalDirection)
       case .rowResize: .rowResize
-      case .rowResizeDirections(let dir):
-        .rowResize(directions: dir.toVerticalDirection)
-
-      case .frameResize(let position, let direction):
+      case .rowResizeDirections(let dir): .rowResize(directions: dir.verticalDirection)
+      case .frameResize(let pos, let dir):
         .frameResize(
-          position: position.toResizePosition,
-          directions: direction.toResizeDirection,
+          position: pos.resizePosition,
+          directions: dir.resizeDirection,
         )
 
-      case .image(let image, let hotSpot): .image(image, hotSpot: hotSpot)
+      case .image(let img, let hotSpot): .image(img, hotSpot: hotSpot)
     }
   }
   #endif

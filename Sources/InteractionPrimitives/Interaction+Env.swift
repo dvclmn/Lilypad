@@ -24,4 +24,3 @@ extension EnvironmentValues {
 
   @Entry public var pointerStyle: PointerStyleCompatible?
 }
-

@@ -8,9 +8,8 @@
 import Foundation
 import GeometryPrimitives
 
-/// This is an improvement over the previous CGRect, which was
-/// trying to wear too many hats
 public enum PointerDragPayload: Sendable, Equatable {
+
   /// For panning/continuous
   case delta(Size<ScreenSpace>, location: Point<ScreenSpace>)
 
@@ -22,12 +21,8 @@ extension PointerDragPayload {
 
   public var name: String {
     switch self {
-      case .delta(let size, let location):
-        "Delta[size: \(size), location: \(location)]"
-
-      case .rect(let from, let current):
-        "Rect[from: \(from), current: \(current)]"
-
+      case .delta(let size, let location): "Delta[size: \(size), location: \(location)]"
+      case .rect(let from, let current): "Rect[from: \(from), current: \(current)]"
     }
   }
 

@@ -14,8 +14,11 @@ extension HoverPhase {
       case .ended: nil
     }
   }
-  
+
   public var interactionPhase: InteractionPhase {
-    .init(fromHover: self)
+    switch self {
+      case .active: .changed
+      case .ended: .ended
+    }
   }
 }

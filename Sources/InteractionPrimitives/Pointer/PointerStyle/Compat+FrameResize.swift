@@ -32,7 +32,7 @@ public enum FrameResizeDirectionCompatible: Int8, CaseIterable, Sendable {
 #if canImport(AppKit)
 extension FrameResizePositionCompatible {
   @available(macOS 15, *)
-  var toResizePosition: FrameResizePosition {
+  var resizePosition: FrameResizePosition {
     switch self {
       case .top: .top
       case .leading: .leading
@@ -47,7 +47,7 @@ extension FrameResizePositionCompatible {
 }
 extension FrameResizeDirectionCompatible {
   @available(macOS 15, *)
-  var toResizeDirection: FrameResizeDirection.Set {
+  var resizeDirection: FrameResizeDirection.Set {
     switch self {
       case .inward: .inward
       case .outward: .outward

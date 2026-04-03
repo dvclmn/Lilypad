@@ -8,11 +8,7 @@
 import GeometryPrimitives
 import SwiftUI
 
-/// Defines the drag interaction mode applied by ``PointerDragModifier``.
-///
-/// - ``marquee``: A transient selection rectangle, cleared when the drag ends.
-/// - ``continuous(axes:)``: An accumulated offset that persists across drags.
-/// - ``none``: No drag response.
+/// Defines the drag interaction mode applied by `PointerDragModifier`.
 public enum DragBehavior: Equatable, Sendable {
 
   /// A transient selection rectangle drawn from the drag origin to the current
@@ -24,8 +20,7 @@ public enum DragBehavior: Equatable, Sendable {
   /// An accumulated offset that persists across drag gestures.
   ///
   /// Each new drag begins from the offset committed by the previous drag, so
-  /// movement compounds over time. Pass a ``GeometryAxis/Set`` to lock to an axis.
-//  case continuous(axes: Axis.Set)
+  /// movement compounds over time. Pass a `GeometryAxis/Set` to lock to an axis.
   case continuous(axes: GeometryAxis.Set)
 
   /// Drag gesture is inactive; no callbacks or state changes are produced.
@@ -45,19 +40,19 @@ extension DragBehavior {
     }
   }
 
-  /// The axis constraint for continuous drags. Returns `.all` for other modes.
+  /// The axis constraint for continuous drags. Only applicable for
+  /// `continuous`, returns `.all` for other modes
   public var axes: GeometryAxis.Set {
     if case .continuous(let axes) = self { return axes }
     return .all
   }
 
-  /// Whether this behavior renders a marquee selection overlay.
   public var isMarquee: Bool {
     if case .marquee = self { return true }
     return false
   }
 
-  /// Whether drag gestures are permitted. `false` only for `.none`.
+  /// Whether drag gestures are permitted.
   public var isEnabled: Bool { self != .none }
 }
 

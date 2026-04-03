@@ -22,7 +22,6 @@ import SwiftUI
 /// - `.vertical`: down (+y) increases zoom; up decreases (matches existing swipe behavior).
 public enum ZoomComputation: Sendable {
 
-  // MARK: Axis Weights
   public struct Weights: Sendable {
     let x: CGFloat
     let y: CGFloat
@@ -32,8 +31,6 @@ public enum ZoomComputation: Sendable {
     /// Vertical-only: down (+y) increases zoom, up decreases.
     public static let vertical = Weights(x: 0, y: 1)
   }
-
-  // MARK: Factor computation
 
   /// Compute a multiplicative zoom factor from a delta in points.
   /// - Parameters:
@@ -48,9 +45,10 @@ public enum ZoomComputation: Sendable {
     weights: Weights = .upRight,
     sensitivity: CGFloat = 1.0,
     maxPerPoint: CGFloat = 0.005,
-    minFactor: CGFloat = 0.1
+    minFactor: CGFloat = 0.1,
   ) -> CGFloat {
     let contribution = (delta.width * weights.x) + (delta.height * weights.y)
+    
     /// Clamp user-facing sensitivity to 0...1, then scale by maxPerPoint to get per-point gain
     let clamped = max(0, min(1, sensitivity))
     let perPoint = clamped * maxPerPoint
@@ -65,7 +63,7 @@ public enum ZoomComputation: Sendable {
     weights: Weights = .upRight,
     sensitivity: CGFloat = 1.0,
     maxPerPoint: CGFloat = 0.005,
-    minFactor: CGFloat = 0.1
+    minFactor: CGFloat = 0.1,
   ) -> CGFloat {
     let delta = CGSize(width: to.x - from.x, height: to.y - from.y)
     return factorFromDelta(
@@ -73,7 +71,7 @@ public enum ZoomComputation: Sendable {
       weights: weights,
       sensitivity: sensitivity,
       maxPerPoint: maxPerPoint,
-      minFactor: minFactor
+      minFactor: minFactor,
     )
   }
 }
