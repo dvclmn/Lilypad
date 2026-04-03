@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import LilyPad
 
 @Observable
 public final class StrokeEngine {

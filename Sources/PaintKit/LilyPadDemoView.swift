@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import LilyPad
 
 /// LilyPad (`.trackpadTouches`) captures raw multi-touch input and
 /// delivers ordered `[TouchPoint]` with stable finger numbering.

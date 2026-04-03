@@ -199,7 +199,7 @@ extension TrackpadMode {
 
   private func restoreCursorPosition() {
     guard let position = savedCursorPosition else { return }
-    
+
     /// `CGWarpMouseCursorPosition` uses top-left origin; convert from NSEvent's
     /// bottom-left screen coordinates.
     let screenHeight = NSScreen.main?.frame.height ?? 0

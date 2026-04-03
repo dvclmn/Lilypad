@@ -6,6 +6,7 @@
 //
 
 extension TrackpadMode {
+  
   /// Pointer behaviours that can be independently toggled.
   public struct Behaviours: OptionSet, Sendable {
     public let rawValue: Int
