@@ -5,19 +5,16 @@
 //  Created by Dave Coleman on 24/6/2025.
 //
 
-import InteractionKit
 import SwiftUI
 
-#if canImport(AppKit)
-
-public struct SwipeGestureModifier: ViewModifier {
+struct SwipeGestureModifier: ViewModifier {
 
   @State private var modifiers: Modifiers = []
 
   let isEnabled: Bool
   let onSwipeGesture: SwipeOutput
 
-  public func body(content: Content) -> some View {
+  func body(content: Content) -> some View {
     content
       .overlay {
         if isEnabled {
@@ -25,17 +22,20 @@ public struct SwipeGestureModifier: ViewModifier {
             self.modifiers = modifiers
             onSwipeGesture(event)
           }
-          /// This adds the modifiers to the Environment. This is also done
-          /// separately by `InteractionKit/ModifierKeysModifier`,
-          /// but thankfully they don't seem to clash
+          /// This adds the modifiers to the Environment. This is also done separately
+          /// by `InteractionKit/ModifierKeysModifier`, but thankfully
+          /// they don't seem to clash.
+          ///
+          /// In this case, the modifiers come from the NSEvent via `scrollWheel(with:)`
+          /// in `SwipeTrackingNSView`, as this gesture, when active, seems to
+          /// block/override reading of modifiers in `ModifierKeysModifier`
           .environment(\.modifierKeys, modifiers)
         }
-
       }
   }
 }
 extension View {
-  /// Typically used for Pan, but useful for other swipe-y things too
+  /// Typically used for Pan, but useful for other swipe-y things too.
   public func onSwipeGesture(
     isEnabled: Bool = true,
     _ onSwipeGesture: @escaping SwipeOutput,
@@ -48,4 +48,3 @@ extension View {
     )
   }
 }
-#endif

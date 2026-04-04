@@ -8,7 +8,13 @@
 import AppKit
 import SwiftUI
 
-/// Based on `NSEvent.Phase`
+/// Based on `NSEvent.Phase`, takes cues from `NSTouch.Phase`.
+///
+/// Purposely omits NSTouch's `any`, as that is a mask for matching multiple
+/// states, whereas `InteractionPhase` represents a single resolved phase.
+/// A wildcard like `any` would be ambiguous here.
+///
+/// For unknown or unmappable input, use `.none`.
 public enum InteractionPhase: String, Sendable, Codable {
   case began
 
@@ -24,16 +30,16 @@ public enum InteractionPhase: String, Sendable, Codable {
   /// User has placed two fingers on trackpad.
   /// Signals the possibility of a gesture
   case mayBegin
-
   case none
 
-  /// `any` is only found in NSTouch, not NSEvent
-  /// Not sure if useful here.
-  //  case any
-
   /// `moved` and `touching` are aliases in NSTouch terms
-  /// I'm choosing `stationary` as an alias for `NSTouch/isResting`
+  /// `stationary` chosen as an alias for `NSTouch/isResting`
   public static let moved: Self = .changed
+
+  /// In NSTouch terms, `.touching` is a mask meaning "finger is down" — a union of
+  /// `.began`, `.moved`, and `.stationary`. Mapped here to `.mayBegin` as a
+  /// coarse "contact present / gesture could form" signal.
+  /// Use `.changed` and `.stationary` to express movement vs. no-movement.
   public static let touching: Self = .mayBegin
   public static let isResting: Self = .stationary
 }
@@ -51,7 +57,7 @@ extension InteractionPhase {
 }
 
 extension InteractionPhase {
-  
+
   public init(from nsEventPhase: NSEvent.Phase) {
     self =
       switch nsEventPhase {

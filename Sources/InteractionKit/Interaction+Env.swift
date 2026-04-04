@@ -38,6 +38,7 @@ extension EnvironmentValues {
   //  @Entry public var coordinateSpaceMapper: CoordinateSpaceMapper?
 
   /// The hover location in resolved CanvasSpace (before pan/zoom)
-  @Entry public var pointerLocation: CGPoint?
+  @Entry public var pointerLocation: Point<CanvasSpace>?
+//  @Entry public var pointerLocation: CGPoint?
 
 }

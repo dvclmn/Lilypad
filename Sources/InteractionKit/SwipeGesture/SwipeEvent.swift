@@ -5,9 +5,6 @@
 //  Created by Dave Coleman on 17/3/2026.
 //
 
-import InteractionKit
-import InteractionKit
-
 public typealias SwipeOutput = (SwipeEvent) -> Void
 public typealias SwipeOutputInternal = (SwipeEvent, Modifiers) -> Void
 
