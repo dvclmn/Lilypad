@@ -61,3 +61,51 @@ public func + <Space>(
     height: lhs.height + rhs.height,
   )
 }
+public func * <Space>(lhs: Size<Space>, rhs: Double) -> Size<Space> {
+  Size<Space>(
+    width: lhs.width * CGFloat(rhs),
+    height: lhs.height * CGFloat(rhs)
+  )
+}
+
+public func * <Space>(lhs: Size<Space>, rhs: CGFloat) -> Size<Space> {
+  Size<Space>(
+    width: lhs.width * rhs,
+    height: lhs.height * rhs
+  )
+}
+
+public func / <Space>(lhs: Size<Space>, rhs: Double) -> Size<Space> {
+  Size<Space>(
+    width: lhs.width / CGFloat(rhs),
+    height: lhs.height / CGFloat(rhs)
+  )
+}
+
+public func / <Space>(lhs: Size<Space>, rhs: CGFloat) -> Size<Space> {
+  Size<Space>(
+    width: lhs.width / rhs,
+    height: lhs.height / rhs
+  )
+}
+
+public func *= <Space>(lhs: inout Size<Space>, rhs: Double) {
+  lhs.width *= CGFloat(rhs)
+  lhs.height *= CGFloat(rhs)
+}
+
+public func *= <Space>(lhs: inout Size<Space>, rhs: CGFloat) {
+  lhs.width *= rhs
+  lhs.height *= rhs
+}
+
+public func /= <Space>(lhs: inout Size<Space>, rhs: Double) {
+  lhs.width /= CGFloat(rhs)
+  lhs.height /= CGFloat(rhs)
+}
+
+public func /= <Space>(lhs: inout Size<Space>, rhs: CGFloat) {
+  lhs.width /= rhs
+  lhs.height /= rhs
+}
+

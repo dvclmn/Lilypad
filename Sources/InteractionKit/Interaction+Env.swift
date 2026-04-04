@@ -25,7 +25,12 @@ extension EnvironmentValues {
 
   /// Aka artwork size, document size
   //  @Entry public var canvasSize: Size<CanvasSpace>?
+  
+  /// Captured by SwiftUI Anchor preference key. The rect origin expresses
+  /// the `panOffset` (from the top left), and the rect size expresses
+  /// the `canvasSize` scaled by the current `zoomLevel`
   @Entry public var artworkFrameInViewport: Rect<ScreenSpace>?
+  
   public var coordinateSpaceMapper: CoordinateSpaceMapper? {
     guard let artworkFrameInViewport, let zoomRange else { return nil }
     return .init(

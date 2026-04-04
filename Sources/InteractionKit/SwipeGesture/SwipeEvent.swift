@@ -5,7 +5,6 @@
 //  Created by Dave Coleman on 17/3/2026.
 //
 
-public typealias SwipeOutput = (SwipeEvent) -> Void
 public typealias SwipeOutputInternal = (SwipeEvent, Modifiers) -> Void
 
 public struct SwipeEvent {

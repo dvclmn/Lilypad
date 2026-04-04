@@ -12,7 +12,7 @@ struct SwipeGestureModifier: ViewModifier {
   @State private var modifiers: Modifiers = []
 
   let isEnabled: Bool
-  let onSwipeGesture: SwipeOutput
+  let action: (SwipeEvent) -> Void
 
   func body(content: Content) -> some View {
     content
@@ -20,7 +20,7 @@ struct SwipeGestureModifier: ViewModifier {
         if isEnabled {
           SwipeGestureView { event, modifiers in
             self.modifiers = modifiers
-            onSwipeGesture(event)
+            action(event)
           }
           /// This adds the modifiers to the Environment. This is also done separately
           /// by `InteractionKit/ModifierKeysModifier`, but thankfully
@@ -38,12 +38,12 @@ extension View {
   /// Typically used for Pan, but useful for other swipe-y things too.
   public func onSwipeGesture(
     isEnabled: Bool = true,
-    _ onSwipeGesture: @escaping SwipeOutput,
+    perform action: @escaping (SwipeEvent) -> Void,
   ) -> some View {
     self.modifier(
       SwipeGestureModifier(
         isEnabled: isEnabled,
-        onSwipeGesture: onSwipeGesture,
+        action: action,
       )
     )
   }

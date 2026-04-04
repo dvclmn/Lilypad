@@ -9,29 +9,25 @@ import Foundation
 
 public struct CoordinateSpaceMapper {
 
-  /// The canvas (artwork) as it's situated in the Viewport.
-  /// Captured via Anchor preference key in `CanvasCoreView`
+  /// The canvas artwork as it's situated in the Viewport.
+  /// Captured via Anchor preference key in `CanvasCoreView`.
+  /// Rect origin represents pan offset, rect size represents
+  /// canvas size scaled by zoom.
   public let artworkFrame: Rect<ScreenSpace>
   public let zoom: Double
-//  public let zoomRange: ClosedRange<Double>?
 
-  /// Zoom is expected to be provided already clamped to `zoomRange`
+  /// Zoom is expected to be provided already clamped to `zoomRange`.
+  /// Clamped zoom value available from the Environment as `zoomClamped`
   public init(
     artworkFrame: Rect<ScreenSpace>,
-    zoom: CGFloat,
-//    zoomRange: ClosedRange<Double>?,
+    zoomClamped zoom: CGFloat,
   ) {
     self.artworkFrame = artworkFrame
     self.zoom = zoom
-//    self.zoomRange = zoomRange
   }
 }
 
 extension CoordinateSpaceMapper {
-//  private var zoomClamped: CGFloat {
-//    guard zoom.isFiniteAndGreaterThanZero else { return 1 }
-//    return zoom.clampedIfNeeded(to: zoomRange)
-//  }
 
   /// Convert screen-space point to canvas-space
   public func canvasPoint(from screenPoint: Point<ScreenSpace>) -> Point<CanvasSpace> {
@@ -62,8 +58,16 @@ extension CoordinateSpaceMapper {
 
   public func isInsideCanvas(
     _ canvasPoint: Point<CanvasSpace>,
-    in canvasSize: Size<CanvasSpace>,
+//    in canvasSize: Size<CanvasSpace>,
   ) -> Bool {
+    
+    let canvasSize = artworkFrame.size / zoom
+
+    let xInBounds = (0..<canvasWidth).contains(canvasPoint.x)
+    let yInBounds = (0..<canvasHeight).contains(canvasPoint.y)
+    return xInBounds && yInBounds
+    
+    
     let canvasXRange = 0..<canvasSize.width
     let canvasYRange = 0..<canvasSize.height
     return canvasXRange.contains(canvasPoint.x)
