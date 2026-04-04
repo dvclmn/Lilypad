@@ -10,9 +10,12 @@ import SwiftUI
 extension EnvironmentValues {
 
   @Entry public var modifierKeys: Modifiers = []
-  
-  @Entry public var panOffset: CGSize = .zero
+
+  @Entry public var panOffset: Size<ScreenSpace> = .zero
   @Entry public var rotation: Angle = .zero
+
+  /// Important: This zoom level is not clamped. Use ``zoomClamped``
+  /// which clamps by ``zoomRange`` if clamping is required
 
   @Entry public var zoomLevel: Double = 1.0
   @Entry public var zoomRange: ClosedRange<Double>?
@@ -25,28 +28,16 @@ extension EnvironmentValues {
 
   @Entry public var pointerStyle: PointerStyleCompatible?
 
-  /// Aka artwork size, document size
-  //  @Entry public var canvasSize: Size<CanvasSpace>?
-  
+  /// Aka artwork/document size. Used internally by CanvasKit only
+  @Entry package var canvasSize: Size<CanvasSpace>?
+
   /// Captured by SwiftUI Anchor preference key. The rect origin expresses
   /// the `panOffset` (from the top left), and the rect size expresses
   /// the `canvasSize` scaled by the current `zoomLevel`
   @Entry public var artworkFrameInViewport: Rect<ScreenSpace>?
-  
-  public var coordinateSpaceMapper: CoordinateSpaceMapper? {
-    guard let artworkFrameInViewport, let zoomRange else { return nil }
-    return .init(
-      artworkFrame: artworkFrameInViewport,
-      zoom: zoomLevel,
-      //      zoom: transform.scale,
-      zoomRange: zoomRange,
-    )
-  }
-  //  @Entry public var coordinateSpaceMapper: CoordinateSpaceMapper?
 
   /// The hover location in resolved CanvasSpace (before pan/zoom)
   @Entry public var pointerLocation: Point<CanvasSpace>?
-  @Entry public var pointerDrag: Rect<ScreenSpace>?
-//  @Entry public var pointerLocation: CGPoint?
+  @Entry public var pointerDrag: Rect<CanvasSpace>?
 
 }
