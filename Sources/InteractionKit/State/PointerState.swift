@@ -6,7 +6,6 @@
 //
 
 import CoreGraphics
-import InteractionKit
 
 public struct PointerState: Sendable, Equatable {
   public var tap: Point<ScreenSpace>?
