@@ -57,20 +57,12 @@ extension CoordinateSpaceMapper {
   }
 
   public func isInsideCanvas(
-    _ canvasPoint: Point<CanvasSpace>,
-//    in canvasSize: Size<CanvasSpace>,
+    _ canvasPoint: Point<CanvasSpace>
   ) -> Bool {
-    
     let canvasSize = artworkFrame.size / zoom
 
-    let xInBounds = (0..<canvasWidth).contains(canvasPoint.x)
-    let yInBounds = (0..<canvasHeight).contains(canvasPoint.y)
+    let xInBounds = (0..<canvasSize.width).contains(canvasPoint.x)
+    let yInBounds = (0..<canvasSize.height).contains(canvasPoint.y)
     return xInBounds && yInBounds
-    
-    
-    let canvasXRange = 0..<canvasSize.width
-    let canvasYRange = 0..<canvasSize.height
-    return canvasXRange.contains(canvasPoint.x)
-      && canvasYRange.contains(canvasPoint.y)
   }
 }

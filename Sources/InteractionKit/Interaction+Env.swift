@@ -9,6 +9,8 @@ import SwiftUI
 
 extension EnvironmentValues {
 
+  @Entry public var modifierKeys: Modifiers = []
+  
   @Entry public var panOffset: CGSize = .zero
   @Entry public var rotation: Angle = .zero
 
