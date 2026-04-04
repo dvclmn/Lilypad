@@ -38,6 +38,8 @@ extension EnvironmentValues {
 
   /// The hover location in resolved CanvasSpace (before pan/zoom)
   @Entry public var pointerLocation: Point<CanvasSpace>?
+  @Entry public var pointerTap: Point<CanvasSpace>?
   @Entry public var pointerDrag: Rect<CanvasSpace>?
 
+  @Entry public var interactionPhase: InteractionPhase = .none
 }

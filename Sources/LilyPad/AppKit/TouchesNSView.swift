@@ -24,7 +24,6 @@ class TrackpadTouchesNSView: NSView {
     wantsRestingTouches = true
   }
 
-  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -33,8 +32,6 @@ class TrackpadTouchesNSView: NSView {
     let touches = touchManager.processTouches(
       event.allTouches(),
       timestamp: event.timestamp,
-      in: .normalised
-//      in: .view(frame.size)
     )
     onTouchesChanged(touches)
   }
@@ -43,4 +40,6 @@ class TrackpadTouchesNSView: NSView {
   override func touchesMoved(with event: NSEvent) { processTouches(with: event) }
   override func touchesEnded(with event: NSEvent) { processTouches(with: event) }
   override func touchesCancelled(with event: NSEvent) { processTouches(with: event) }
+//  override func pressureChange(with event: NSEvent) {
+//  }
 }

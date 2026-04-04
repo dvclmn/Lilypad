@@ -29,11 +29,6 @@ class TrackpadTouchManager {
   /// Range: 0 (frozen) to 1 (no smoothing). Default `0.3`.
   var smoothingFactor: CGFloat = 0.3
 
-  enum CoordinateSpace {
-    case normalised
-    case view(CGSize)
-  }
-
   /// Per-touch bookkeeping, keyed by touch identity hash.
   private var history: [TouchID: TouchState] = [:]
 
@@ -45,7 +40,6 @@ class TrackpadTouchManager {
   func processTouches(
     _ nsTouches: Set<NSTouch>,
     timestamp: TimeInterval,
-    in space: CoordinateSpace,
   ) -> [TouchPoint] {
 
     var results: [TouchPoint] = []
@@ -53,7 +47,7 @@ class TrackpadTouchManager {
 
     for touch in nsTouches {
       let id = TouchID(rawValue: touch.identity.hash)
-      let position = position(for: touch, in: space)
+      let position = touch.normalizedPosition
 
       /// Calculate smoothed velocity from history
       var velocity = CGVector.zero
@@ -102,7 +96,8 @@ class TrackpadTouchManager {
           magnitude: magnitude,
           phase: InteractionPhase(from: touch.phase),
           isResting: touch.isResting,
-        ))
+        )
+      )
     }
 
     /// Sort by first-seen time (earliest first), then assign stable order indices
@@ -122,21 +117,6 @@ class TrackpadTouchManager {
         phase: point.phase,
         isResting: point.isResting,
       )
-    }
-  }
-
-  private func position(
-    for touch: NSTouch,
-    in space: CoordinateSpace,
-  ) -> CGPoint {
-    let normalised = touch.normalizedPosition
-    return switch space {
-      case .normalised: normalised
-      case .view(let size):
-        CGPoint(
-          x: size.width * normalised.x,
-          y: size.height * (1 - normalised.y),
-        )
     }
   }
 }
