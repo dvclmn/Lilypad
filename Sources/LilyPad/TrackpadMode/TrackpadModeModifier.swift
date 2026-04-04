@@ -16,14 +16,22 @@ import SwiftUI
 /// modifier directly.
 struct TrackpadModeModifier: ViewModifier {
   @State private var store: TrackpadModeHandler = .init()
-  //  let mode: TrackpadModeHandler
 
-  let isActive: Bool
+  let mode: TrackpadMode
+
   func body(content: Content) -> some View {
     content
-      .onAppear { store.setUp() }
-      .onDisappear { store.tearDown() }
-      .onChange(of: isActive) { store.update(isActive) }
+      .onAppear {
+        guard mode.shouldHidePointer else { return }
+        store.setUp()
+      }
+      .onDisappear {
+        guard mode.shouldHidePointer else { return }
+        store.tearDown()
+      }
+      .onChange(of: mode) {
+        store.update(mode.shouldHidePointer)
+      }
   }
 }
 
@@ -47,8 +55,9 @@ extension View {
   ///     Toggle("Draw", isOn: $trackpadMode.isActive)
   ///   }
   /// ```
-  public func trackpadMode(_ isActive: Bool) -> some View {
-    self.modifier(TrackpadModeModifier(isActive: isActive))
-  }
+//  public func trackpadMode(_ mode: TrackpadMode) -> some View {
+////  public func trackpadMode(_ isActive: Bool) -> some View {
+//    self.modifier(TrackpadModeModifier(mode: mode))
+//  }
 }
 #endif

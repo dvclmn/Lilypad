@@ -19,13 +19,6 @@ public final class TrackpadModeHandler {
   /// I may consider instead driving this via `onChange()` in the View
   /// rather than `didSet`; maybe more SwiftUI-like?
   var isActive: Bool = false
-//  public var isActive: Bool = false {
-//    didSet {
-//      guard isActive != oldValue else { return }
-//      isActive ? engage() : disengage()
-//      //      if isActive { engage() } else { disengage() }
-//    }
-//  }
 
   // MARK: - Internal state
 

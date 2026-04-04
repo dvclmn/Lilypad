@@ -14,7 +14,8 @@ import SwiftUI
 struct TrackpadTouchesModifier: ViewModifier {
   @State private var touches: [TouchPoint] = []
 
-  let isEnabled: Bool
+  let mode: TrackpadMode
+  //  let isEnabled: Bool
   let showsIndicators: Bool
   let action: TouchesUpdate
 
@@ -22,23 +23,21 @@ struct TrackpadTouchesModifier: ViewModifier {
     //    GeometryReader { proxy in
     content
       .overlay {
-        if isEnabled {
-          TrackpadTouchesView { incoming in
-            action(incoming)
+        if mode.isEnabled {
+          TrackpadTouchesView { touches in
+            action(touches)
             if showsIndicators {
-              touches = incoming
+              self.touches = touches
             }
           }
         }
 
-        if isEnabled, showsIndicators {
-          TouchIndicatorsView(
-            touches: touches
-              //            containerSize: proxy.size,
-          )
+        if mode.isEnabled, showsIndicators {
+          TouchIndicatorsView(touches: touches)
         }
 
       }  // END overlay
+      .modifier(TrackpadModeModifier(mode: mode))
 
     //    }
   }
@@ -55,16 +54,30 @@ extension View {
   ///   - action: Called each time touches change, with an array of
   ///     ``TouchPoint`` values sorted by first-contact order.
   public func trackpadTouches(
-    isEnabled: Bool = true,
+    mode: TrackpadMode = .inactive,
     showsIndicators: Bool = true,
     perform action: @escaping TouchesUpdate,
   ) -> some View {
     self.modifier(
       TrackpadTouchesModifier(
-        isEnabled: isEnabled,
+        mode: mode,
         showsIndicators: showsIndicators,
         action: action,
       )
     )
   }
+
+  //  public func trackpadTouches(
+  //    isEnabled: Bool = true,
+  //    showsIndicators: Bool = true,
+  //    perform action: @escaping TouchesUpdate,
+  //  ) -> some View {
+  //    self.modifier(
+  //      TrackpadTouchesModifier(
+  //        mode: TrackpadMode.,
+  //        showsIndicators: showsIndicators,
+  //        action: action,
+  //      )
+  //    )
+  //  }
 }
