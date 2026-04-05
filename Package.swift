@@ -18,12 +18,17 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0")
+    .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
+    .package(url: "https://github.com/dvclmn/BasePrimitives", branch: "main"),
   ],
 
   targets: [
     .target(
-      name: "InteractionKit"
+      name: "InteractionKit",
+      dependencies: [
+        "BasePrimitives"
+//        .product(name: "BasePrimitives", package: "BasePrimitives")
+      ],
     ),
     .target(
       name: "PaintKit",
@@ -35,7 +40,8 @@ let package = Package(
     .target(
       name: "LilyPad",
       dependencies: [
-        .module(.interactionKit)
+        .module(.interactionKit),
+        "BasePrimitives"
       ],
     ),
     //    .testTarget(

@@ -9,8 +9,6 @@ import SwiftUI
 
 extension EnvironmentValues {
 
-  @Entry public var modifierKeys: Modifiers = []
-
   @Entry public var panOffset: Size<ScreenSpace> = .zero
   @Entry public var rotation: Angle = .zero
 

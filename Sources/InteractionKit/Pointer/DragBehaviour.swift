@@ -5,7 +5,8 @@
 //  Created by Dave Coleman on 14/1/2026.
 //
 
-import InteractionKit
+//import InteractionKit
+import BasePrimitives
 import SwiftUI
 
 /// Defines the drag interaction mode applied by `PointerDragModifier`.
