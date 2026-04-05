@@ -5,6 +5,8 @@
 //  Created by Dave Coleman on 17/3/2026.
 //
 
+import BasePrimitives
+
 public typealias SwipeOutputInternal = (SwipeEvent, Modifiers) -> Void
 
 public struct SwipeEvent {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import BasePrimitives
 
 struct SwipeGestureModifier: ViewModifier {
 
