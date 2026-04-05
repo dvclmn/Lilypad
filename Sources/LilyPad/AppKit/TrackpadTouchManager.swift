@@ -32,6 +32,18 @@ class TrackpadTouchManager {
   /// Per-touch bookkeeping, keyed by touch identity hash.
   private var history: [TouchID: TouchState] = [:]
 
+  /// Ambient Force Touch pressure (0–1) from the most recent event.
+  private(set) var currentPressure: CGFloat = 0
+
+  /// Ambient Force Touch stage (0, 1, or 2) from the most recent event.
+  private(set) var currentStage: Int = 0
+
+  /// Updates the ambient pressure and stage from a `pressureChange` event.
+  func updatePressure(_ pressure: CGFloat, stage: Int) {
+    currentPressure = pressure
+    currentStage = stage
+  }
+
   /// Processes a set of raw `NSTouch` values from a single event into an
   /// ordered array of ``TouchPoint`` values.
   ///
@@ -94,6 +106,8 @@ class TrackpadTouchManager {
           position: position,
           velocity: velocity,
           magnitude: magnitude,
+          pressure: currentPressure,
+          stage: currentStage,
           phase: InteractionPhase(from: touch.phase),
           isResting: touch.isResting,
         )
@@ -114,6 +128,8 @@ class TrackpadTouchManager {
         position: point.position,
         velocity: point.velocity,
         magnitude: point.magnitude,
+        pressure: point.pressure,
+        stage: point.stage,
         phase: point.phase,
         isResting: point.isResting,
       )

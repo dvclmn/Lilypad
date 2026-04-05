@@ -38,6 +38,16 @@ public struct TouchPoint: Identifiable, Hashable, Sendable {
   /// Scalar speed — the magnitude of `velocity`.
   public let magnitude: CGFloat
 
+  /// Force Touch pressure as reported by the trackpad hardware.
+  /// Range is 0.0 (no pressure) to 1.0 (maximum pressure).
+  /// This is an ambient value — the trackpad reports a single pressure
+  /// for the whole surface, so all active touches share the same reading.
+  public let pressure: CGFloat
+
+  /// Force Touch stage: 0 = not pressing, 1 = normal click,
+  /// 2 = deep (force) click. Ambient, same as `pressure`.
+  public let stage: Int
+
   /// Current phase of this touch in its lifecycle.
   public let phase: InteractionPhase
 
@@ -52,6 +62,8 @@ public struct TouchPoint: Identifiable, Hashable, Sendable {
     position: CGPoint,
     velocity: CGVector,
     magnitude: CGFloat,
+    pressure: CGFloat = 0,
+    stage: Int = 0,
     phase: InteractionPhase,
     isResting: Bool = false,
   ) {
@@ -60,6 +72,8 @@ public struct TouchPoint: Identifiable, Hashable, Sendable {
     self.position = position
     self.velocity = velocity
     self.magnitude = magnitude
+    self.pressure = pressure
+    self.stage = stage
     self.phase = phase
     self.isResting = isResting
   }

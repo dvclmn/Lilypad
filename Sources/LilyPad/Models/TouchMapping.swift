@@ -84,6 +84,8 @@ extension TouchMapping {
             position: mappedPosition,
             velocity: mappedVelocity,
             magnitude: mappedMagnitude,
+            pressure: point.pressure,
+            stage: point.stage,
             phase: point.phase,
             isResting: point.isResting,
           )

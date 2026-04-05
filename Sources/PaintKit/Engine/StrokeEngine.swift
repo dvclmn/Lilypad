@@ -16,11 +16,17 @@ public final class StrokeEngine {
   public private(set) var completedStrokes: [CompletedStroke] = []
 
   public private(set) var brushStyle: BrushStyle = .default
+  
 
   public init() {}
 }
 
 extension StrokeEngine {
+  
+  public var pressure: CGFloat {
+    guard let first = activeStrokes.values.first else { return 0 }
+    return first.
+  }
 
   /// Process a frame of touch input.
   ///

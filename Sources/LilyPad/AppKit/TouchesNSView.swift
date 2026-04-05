@@ -51,6 +51,9 @@ extension TrackpadTouchesNSView {
   override func touchesMoved(with event: NSEvent) { processTouches(with: event) }
   override func touchesEnded(with event: NSEvent) { processTouches(with: event) }
   override func touchesCancelled(with event: NSEvent) { processTouches(with: event) }
-  //  override func pressureChange(with event: NSEvent) {
-  //  }
+
+  override func pressureChange(with event: NSEvent) {
+    touchManager.updatePressure(CGFloat(event.pressure), stage: event.stage)
+    processTouches(with: event)
+  }
 }
