@@ -28,7 +28,7 @@ struct TrackpadTouchesModifier: ViewModifier {
     content
       .overlay {
         if mode.isEnabled {
-          TrackpadTouchesView { touches in
+          TrackpadTouchesView(isActive: mode.isEnabled) { touches in
 
             let mapped = mapping.mapTouches(touches, in: canvasSize)
             action(mapped)
@@ -70,7 +70,6 @@ extension View {
   ///     ``TouchPoint`` values sorted by first-contact order.
   public func trackpadTouches(
     canvasSize: CGSize,
-    //    canvasSize: Size<CanvasSpace>,
     mode: TrackpadMode = .inactive,
     mapping: TouchMapping = .fit,
     showsIndicators: Bool = true,
@@ -86,18 +85,4 @@ extension View {
       )
     )
   }
-
-  //  public func trackpadTouches(
-  //    isEnabled: Bool = true,
-  //    showsIndicators: Bool = true,
-  //    perform action: @escaping TouchesUpdate,
-  //  ) -> some View {
-  //    self.modifier(
-  //      TrackpadTouchesModifier(
-  //        mode: TrackpadMode.,
-  //        showsIndicators: showsIndicators,
-  //        action: action,
-  //      )
-  //    )
-  //  }
 }

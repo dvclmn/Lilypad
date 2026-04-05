@@ -19,13 +19,16 @@ public enum TouchMapping {
   case normalised
 }
 
+/// Note: magnitude is recomputed from the transformed velocity
+/// to match `Touch​Point`’s semantics.
+/// `magnitude` represents the magnitude of `velocity`.
 extension TouchMapping {
   func mapTouches(
     _ touches: [TouchPoint],
     in viewSize: Size<CanvasSpace>,
     sourceAspectRatio: CGFloat = CGSize.trackpadAspectRatio
   ) -> [TouchPoint] {
-    // Guard against invalid sizes
+    /// Guard against invalid sizes
     guard viewSize.width > 0, viewSize.height > 0 else { return touches }
 
     switch self {

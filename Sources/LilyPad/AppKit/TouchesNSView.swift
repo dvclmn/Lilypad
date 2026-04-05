@@ -27,6 +27,17 @@ class TrackpadTouchesNSView: NSView {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+}
+
+extension TrackpadTouchesNSView {
+
+  override var acceptsFirstResponder: Bool { true }
+
+  /// Reclaim first responder so trackpad touches route here.
+  func claimFocus() {
+    guard window?.firstResponder !== self else { return }
+    window?.makeFirstResponder(self)
+  }
 
   private func processTouches(with event: NSEvent) {
     let touches = touchManager.processTouches(
@@ -40,6 +51,6 @@ class TrackpadTouchesNSView: NSView {
   override func touchesMoved(with event: NSEvent) { processTouches(with: event) }
   override func touchesEnded(with event: NSEvent) { processTouches(with: event) }
   override func touchesCancelled(with event: NSEvent) { processTouches(with: event) }
-//  override func pressureChange(with event: NSEvent) {
-//  }
+  //  override func pressureChange(with event: NSEvent) {
+  //  }
 }

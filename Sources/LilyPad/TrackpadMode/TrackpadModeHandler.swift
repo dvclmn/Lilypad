@@ -117,6 +117,10 @@ extension TrackpadModeHandler {
     /// Note: `NSEvent.mouseLocation` is in screen coordinates, origin is bottom-left
     savedCursorPosition = screenCursorPosition()
 
+    /// Warp the cursor into the content area so the system's hit-test
+    /// routes trackpad touches to our NSView, not the toolbar.
+    warpCursorToContentCenter()
+
     if behaviours.contains(.lock) {
       lockCursor()
     }
@@ -194,6 +198,27 @@ extension TrackpadModeHandler {
     guard cursorIsLocked else { return }
     CGAssociateMouseAndMouseCursorPosition(1)
     cursorIsLocked = false
+  }
+
+  // MARK: Cursor warping
+
+  /// Moves the cursor to the centre of the key window's content area.
+  /// This ensures the system's hit-test targets the `TrackpadTouchesNSView`
+  /// rather than the toolbar or title bar. Uses `CGWarpMouseCursorPosition`
+  /// which expects top-left screen coordinates.
+  private func warpCursorToContentCenter() {
+    guard let window = NSApplication.shared.keyWindow else { return }
+    let contentRect = window.contentLayoutRect
+    let centerInWindow = CGPoint(
+      x: contentRect.midX,
+      y: contentRect.midY,
+    )
+    let centerInScreen = window.convertPoint(toScreen: centerInWindow)
+
+    /// Convert from AppKit bottom-left to CG top-left coordinates
+    let screenHeight = window.screen?.frame.height ?? NSScreen.main?.frame.height ?? 0
+    let flipped = CGPoint(x: centerInScreen.x, y: screenHeight - centerInScreen.y)
+    CGWarpMouseCursorPosition(flipped)
   }
 
   // MARK: Cursor position
