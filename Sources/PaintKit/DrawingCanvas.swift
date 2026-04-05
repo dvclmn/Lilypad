@@ -43,8 +43,7 @@ public struct DrawingCanvas: View {
 
       for stroke in engine.filteredStrokes(using: .distance(minSeparation: 6)) {
         renderStroke(
-          for: .completed,
-//          for: .completed(stroke.style),
+          for: .completed(stroke.style),
           points: stroke.points,
           touchOrder: stroke.touchOrder,
           in: &context,
@@ -75,7 +74,7 @@ extension DrawingCanvas {
 
     let placeholderColour: Color = .gray
     let opacity = phase.isActive ? 0.6 : 1.0
-//    let style = phase.style ?? engine.brushStyle
+    let style = phase.style ?? engine.brushStyle
 
     let path = buildPath(from: points, style: style)
     context.fill(path, with: .color(placeholderColour.opacity(opacity)))

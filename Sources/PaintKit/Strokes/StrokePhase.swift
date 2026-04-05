@@ -16,6 +16,9 @@ enum StrokePhase: Hashable {
     case active
     case completed
   }
+}
+
+extension StrokePhase {
 
   var isActive: Bool {
     if case .active = self {
@@ -23,29 +26,26 @@ enum StrokePhase: Hashable {
     }
     return false
   }
+  var style: BrushStyle? {
+    switch self {
+      case .active: nil
+      case .completed(let brushStyle): brushStyle
+    }
+  }
 
   init?(fromMeta meta: Self.Meta) {
     switch meta {
       case .active: self = .active
       case .completed: return nil
-    //      case .completed: .completed(.default)
     }
   }
 
-  var meta: Self.Meta {
-    .init(self)
-  }
+  var meta: Self.Meta { .init(fromParent: self) }
 
-  //  var style: BrushStyle? {
-  //    switch self {
-  //      case .active: nil
-  //      case .completed(let brushStyle): brushStyle
-  //    }
-  //  }
 }
 
 extension StrokePhase.Meta {
-  init(_ parent: StrokePhase) {
+  init(fromParent parent: StrokePhase) {
     self =
       switch parent {
         case .active: .active

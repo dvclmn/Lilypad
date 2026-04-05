@@ -23,4 +23,9 @@ public struct StrokePoint: Hashable, Codable, Sendable {
 
   /// Which finger produced this point (0-based, ordered by first contact).
   public var touchOrder: Int
+
+  /// Force Touch pressure at this point in the stroke.
+  /// Range is 0.0 (no pressure) to 1.0 (maximum pressure).
+  /// Useful for pressure-sensitive brush rendering (harder → thicker/darker).
+  public var pressure: CGFloat
 }

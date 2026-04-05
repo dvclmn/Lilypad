@@ -16,17 +16,18 @@ public final class StrokeEngine {
   public private(set) var completedStrokes: [Stroke] = []
 
   public private(set) var brushStyle: BrushStyle = .default
-  
 
   public init() {}
 }
 
 extension StrokeEngine {
-  
-//  public var pressure: CGFloat {
-//    guard let first = activeStrokes.values.first else { return 0 }
-//    return first.
-//  }
+
+  public var pressure: CGFloat {
+    guard let firstStroke = activeStrokes.values.first,
+      let firstPoint = firstStroke.points.first
+    else { return 0 }
+    return firstPoint.pressure
+  }
 
   /// Process a frame of touch input.
   ///
@@ -34,12 +35,12 @@ extension StrokeEngine {
   /// update. The engine handles the full lifecycle: creating strokes on
   /// `began`, appending points on `changed`, and finalising on `ended`.
   public func processTouches(
-    _ touches: [TouchPoint],
-//    with style: BrushStyle,
+    _ touches: [TouchPoint]
+    //    with style: BrushStyle,
   ) {
-//    if brushStyle == nil {
-//      brushStyle = style
-//    }
+    //    if brushStyle == nil {
+    //      brushStyle = style
+    //    }
 
     for touch in touches where !touch.isResting {
       switch touch.phase {
@@ -84,6 +85,7 @@ extension StrokeEngine {
       position: touch.position,
       speed: touch.magnitude,
       touchOrder: touch.touchOrder,
+      pressure: touch.pressure
     )
     activeStrokes[touch.id] = ActiveStroke(
       id: touch.id,
@@ -100,14 +102,15 @@ extension StrokeEngine {
         position: touch.position,
         speed: touch.magnitude,
         touchOrder: touch.touchOrder,
+        pressure: touch.pressure
       ))
     activeStrokes[touch.id] = stroke
   }
 
   private func finishStroke(for touch: TouchPoint) {
-//    defer { brushStyle = nil }
+    //    defer { brushStyle = nil }
     guard let stroke = activeStrokes.removeValue(forKey: touch.id)
-//      let style = brushStyle
+    //      let style = brushStyle
     else { return }
     guard stroke.points.count >= 2 else { return }
 

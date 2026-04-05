@@ -5,7 +5,7 @@
 //  Created by Dave Coleman on 28/3/2026.
 //
 
-import Foundation
+//import Foundation
 
 /// A recorded sequence of points from a single continuous finger contact.
 ///
