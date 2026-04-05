@@ -8,7 +8,7 @@ import Foundation
 import LilyPad
 
 /// A stroke currently being drawn — accumulating points while a finger is down.
-public struct ActiveStroke: Identifiable {
+public struct ActiveStroke: Identifiable, StrokeData {
 
   /// Touch identity (from `NSTouch.identity`), stable for this contact's lifetime.
   public let id: TouchID

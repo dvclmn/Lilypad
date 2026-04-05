@@ -13,7 +13,7 @@ public final class StrokeEngine {
   public private(set) var activeStrokes: [TouchID: ActiveStroke] = [:]
 
   /// Strokes that have been completed (finger lifted).
-  public private(set) var completedStrokes: [CompletedStroke] = []
+  public private(set) var completedStrokes: [Stroke] = []
 
   public private(set) var brushStyle: BrushStyle = .default
   
@@ -112,7 +112,7 @@ extension StrokeEngine {
     guard stroke.points.count >= 2 else { return }
 
     completedStrokes.append(
-      CompletedStroke(
+      Stroke(
         touchOrder: stroke.touchOrder,
         points: stroke.points,
         style: brushStyle,
@@ -128,13 +128,13 @@ extension StrokeEngine {
   /// The engine's stored data stays untouched (raw, full-fidelity capture).
   public func filteredStrokes(
     using filter: StrokeFilterType
-  ) -> [CompletedStroke] {
+  ) -> [Stroke] {
     switch filter {
       case .none:
         return completedStrokes
       default:
         return completedStrokes.map { stroke in
-          CompletedStroke(
+          Stroke(
             touchOrder: stroke.touchOrder,
             points: filter.applied(to: stroke.points),
             style: stroke.style,

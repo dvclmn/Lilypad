@@ -4,6 +4,7 @@
 //
 
 import CoreGraphics
+import Foundation
 
 /// Configuration for how a stroke's visual width relates to drawing speed.
 ///
@@ -20,7 +21,9 @@ import CoreGraphics
 /// - ``maxSpeed`` should be calibrated to typical fast strokes on your
 ///   trackpad. Values around 1000–2000 pt/s work well in practice.
 ///
-public struct BrushStyle: Sendable, Codable, Equatable {
+public struct BrushStyle: Sendable, Codable, Equatable, Hashable, Identifiable {
+  
+  public let id: UUID
   /// Width when the finger is moving slowly or at rest.
   public var maxWidth: CGFloat
 
@@ -37,11 +40,13 @@ public struct BrushStyle: Sendable, Codable, Equatable {
   public var speedCurve: CGFloat
 
   public init(
+    id: UUID = .init(),
     maxWidth: CGFloat = 18,
     minWidth: CGFloat = 1.5,
     maxSpeed: CGFloat = 1400,
     speedCurve: CGFloat = 0.45,
   ) {
+    self.id = id
     self.maxWidth = maxWidth
     self.minWidth = minWidth
     self.maxSpeed = maxSpeed

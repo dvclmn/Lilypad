@@ -9,8 +9,8 @@ import Foundation
 import LilyPad
 
 /// A finished stroke — the finger has lifted and the points are final.
-public struct CompletedStroke: Identifiable {
-  public let id: UUID = UUID()
+public struct Stroke: Hashable, Codable, Sendable, Identifiable, StrokeData {
+  public let id: UUID
 
   /// Which finger drew this stroke (for colour assignment, etc.).
   public let touchOrder: Int
@@ -19,4 +19,16 @@ public struct CompletedStroke: Identifiable {
   public let points: [StrokePoint]
   
   public let style: BrushStyle
+  
+  public init(
+    id: UUID = .init(),
+    touchOrder: Int,
+    points: [StrokePoint],
+    style: BrushStyle = .default
+  ) {
+    self.id = id
+    self.touchOrder = touchOrder
+    self.points = points
+    self.style = style
+  }
 }

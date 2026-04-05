@@ -12,7 +12,7 @@ import Foundation
 /// downstream rendering can vary width, opacity, or colour based on how the
 /// user was moving. A future brush engine could extend this with pressure,
 /// tilt, or timestamp fields.
-public struct StrokePoint: Hashable, Sendable {
+public struct StrokePoint: Hashable, Codable, Sendable {
   
   /// Position in view coordinates at the time of capture.
   public var position: CGPoint
