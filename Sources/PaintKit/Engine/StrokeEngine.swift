@@ -23,10 +23,10 @@ public final class StrokeEngine {
 
 extension StrokeEngine {
   
-  public var pressure: CGFloat {
-    guard let first = activeStrokes.values.first else { return 0 }
-    return first.
-  }
+//  public var pressure: CGFloat {
+//    guard let first = activeStrokes.values.first else { return 0 }
+//    return first.
+//  }
 
   /// Process a frame of touch input.
   ///

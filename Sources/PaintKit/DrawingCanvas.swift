@@ -43,7 +43,8 @@ public struct DrawingCanvas: View {
 
       for stroke in engine.filteredStrokes(using: .distance(minSeparation: 6)) {
         renderStroke(
-          for: .completed(stroke.style),
+          for: .completed,
+//          for: .completed(stroke.style),
           points: stroke.points,
           touchOrder: stroke.touchOrder,
           in: &context,
@@ -64,7 +65,7 @@ public struct DrawingCanvas: View {
 extension DrawingCanvas {
 
   private func renderStroke(
-    for kind: StrokeKind,
+    for phase: StrokePhase,
     points: [StrokePoint],
     touchOrder: Int,
 
@@ -73,8 +74,8 @@ extension DrawingCanvas {
     guard points.count >= 2 else { return }
 
     let placeholderColour: Color = .gray
-    let opacity = kind.isActive ? 0.6 : 1.0
-    let style = kind.style ?? engine.brushStyle
+    let opacity = phase.isActive ? 0.6 : 1.0
+    let style = phase.style ?? engine.brushStyle
 
     let path = buildPath(from: points, style: style)
     context.fill(path, with: .color(placeholderColour.opacity(opacity)))
@@ -110,21 +111,3 @@ extension DrawingCanvas {
   }
 }
 
-enum StrokeKind {
-  case active
-  case completed(BrushStyle)
-
-  var isActive: Bool {
-    if case .active = self {
-      return true
-    }
-    return false
-  }
-
-  var style: BrushStyle? {
-    switch self {
-      case .active: nil
-      case .completed(let brushStyle): brushStyle
-    }
-  }
-}
