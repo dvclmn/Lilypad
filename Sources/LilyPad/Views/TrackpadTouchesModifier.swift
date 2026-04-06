@@ -5,6 +5,7 @@
 //  Created by Dave Coleman on 7/5/2025.
 //
 
+import BasePrimitives
 import InteractionKit
 import SwiftUI
 
@@ -16,43 +17,62 @@ struct TrackpadTouchesModifier: ViewModifier {
   @State private var touchesForIndicators: [TouchPoint] = []
 
   let canvasSize: Size<CanvasSpace>
+  let mapping: TouchMapping
   let trackpadMode: TrackpadMode
   let trackpadMatchesZoom: Bool
-  let mapping: TouchMapping
-  let showsIndicators: Bool
-  let showsGuide: Bool
+  let guideVisibility: TrackpadGuideVisibility
+  let showsTouchIndicators: Bool
   let action: TouchesUpdate
 
   func body(content: Content) -> some View {
     content
       .overlay {
-        if trackpadMode.isEnabled {
-          TrackpadTouchesView(isActive: trackpadMode.isEnabled) { touches in
+        if effectiveTrackpadMode.isEnabled {
+          TrackpadTouchesView(isActive: effectiveTrackpadMode.isEnabled) { touches in
 
             let mapped = mapping.mapTouches(touches, in: canvasSize)
             action(mapped)
 
-            if showsIndicators {
+            if showsTouchIndicators {
               self.touchesForIndicators = mapped
             }
           }
         }
 
-        if trackpadMode.isEnabled, showsIndicators {
+        if effectiveTrackpadMode.isEnabled, showsTouchIndicators {
           TouchIndicatorsView(touches: touchesForIndicators)
         }
 
-        if trackpadMode.isEnabled, showsGuide,
-           let rect = mapping.mappedRect(in: canvasSize) {
+        let rect = TrackpadMappedRect.makeRect(
+          in: canvasSize,
+          mapping: mapping,
+          sourceAspectRatio: CGSize.trackpadAspectRatio,
+        )
+
+        if effectiveTrackpadMode.isEnabled, showsGuide, let rect {
           TrackpadGuideView(mappedRect: rect)
         }
 
       }  // END overlay
 
-      .modifier(TrackpadModeModifier(mode: trackpadMode))
+      .modifier(TrackpadModeModifier(mode: effectiveTrackpadMode))
   }
 }
 
+extension TrackpadTouchesModifier {
+  private var effectiveTrackpadMode: TrackpadMode {
+    .inactive
+    //    isPreview ? .active : trackpadMode
+  }
+
+  private var showsGuide: Bool {
+    switch guideVisibility {
+      case .always: true
+      case .drawingMode: effectiveTrackpadMode.isEnabled ? true : false
+      case .never: false
+    }
+  }
+}
 
 extension View {
 
@@ -70,7 +90,7 @@ extension View {
     trackpadMatchesZoom: Bool,
     mapping: TouchMapping = .fit,
     showsIndicators: Bool = true,
-    showsGuide: Bool = false,
+    guideVisibility: TrackpadGuideVisibility = .always,
     perform action: @escaping TouchesUpdate,
   ) -> some View {
     self.modifier(
@@ -80,7 +100,7 @@ extension View {
         trackpadMatchesZoom: trackpadMatchesZoom,
         mapping: mapping,
         showsIndicators: showsIndicators,
-        showsGuide: showsGuide,
+        guideVisibility: guideVisibility,
         action: action,
       )
     )

@@ -26,7 +26,7 @@ public struct TrackpadMappedRect: Equatable, Sendable {
 extension TrackpadMappedRect {
   
   /// Computes the rectangle within the view that the trackpad maps onto.
-  public func mappedRect(
+  public static func makeRect(
     in viewSize: Size<CanvasSpace>,
     mapping: TouchMapping,
     sourceAspectRatio: CGFloat = CGSize.trackpadAspectRatio

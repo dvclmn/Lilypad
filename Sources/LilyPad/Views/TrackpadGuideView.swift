@@ -23,10 +23,10 @@ struct TrackpadGuideView: View {
         style: StrokeStyle(lineWidth: 1, dash: [6, 4])
       )
       .frame(width: mappedRect.size.width, height: mappedRect.size.height)
-      .position(
-        x: mappedRect.origin.x + mappedRect.size.width / 2,
-        y: mappedRect.origin.y + mappedRect.size.height / 2
-      )
+//      .position(
+//        x: mappedRect.origin.x + mappedRect.size.width / 2,
+//        y: mappedRect.origin.y + mappedRect.size.height / 2
+//      )
       .allowsHitTesting(false)
   }
 }
