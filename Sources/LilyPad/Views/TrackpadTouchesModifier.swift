@@ -49,7 +49,7 @@ struct TrackpadTouchesModifier: ViewModifier {
           sourceAspectRatio: CGSize.trackpadAspectRatio,
         )
 
-        if effectiveTrackpadMode.isEnabled, showsGuide, let rect {
+        if showsGuide, let rect {
           TrackpadGuideView(mappedRect: rect)
         }
 
@@ -61,8 +61,8 @@ struct TrackpadTouchesModifier: ViewModifier {
 
 extension TrackpadTouchesModifier {
   private var effectiveTrackpadMode: TrackpadMode {
-    .inactive
-    //    isPreview ? .active : trackpadMode
+//    .inactive
+        isPreview ? .active : trackpadMode
   }
 
   private var showsGuide: Bool {
@@ -86,21 +86,21 @@ extension View {
   ///     ``TouchPoint`` values sorted by first-contact order.
   public func trackpadTouches(
     canvasSize: CGSize,
+    mapping: TouchMapping = .fit,
     mode: TrackpadMode = .inactive,
     trackpadMatchesZoom: Bool,
-    mapping: TouchMapping = .fit,
-    showsIndicators: Bool = true,
     guideVisibility: TrackpadGuideVisibility = .always,
+    showsTouchIndicators: Bool = true,
     perform action: @escaping TouchesUpdate,
   ) -> some View {
     self.modifier(
       TrackpadTouchesModifier(
         canvasSize: .init(fromCGSize: canvasSize),
+        mapping: mapping,
         trackpadMode: mode,
         trackpadMatchesZoom: trackpadMatchesZoom,
-        mapping: mapping,
-        showsIndicators: showsIndicators,
         guideVisibility: guideVisibility,
+        showsTouchIndicators: showsTouchIndicators,
         action: action,
       )
     )

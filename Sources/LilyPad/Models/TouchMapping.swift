@@ -8,7 +8,7 @@
 import Foundation
 import InteractionKit
 
-public enum TouchMapping {
+public enum TouchMapping: String, Equatable, Codable, Sendable {
   /// Default — guarantees all touches fit within View
   case fit
 
