@@ -30,4 +30,12 @@ extension TrackpadGuideVisibility {
       case .never: "rectangle.slash"
     }
   }
+  
+  public func shouldShowGuide(for mode: TrackpadMode) -> Bool {
+    switch self {
+      case .always: true
+      case .drawingMode: mode.isEnabled
+      case .never: false
+    }
+  }
 }

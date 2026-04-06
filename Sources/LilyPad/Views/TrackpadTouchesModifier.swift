@@ -27,30 +27,19 @@ struct TrackpadTouchesModifier: ViewModifier {
   func body(content: Content) -> some View {
     content
       .overlay {
+
+        /// NSView that detects touches
         if effectiveTrackpadMode.isEnabled {
-          TrackpadTouchesView(isActive: effectiveTrackpadMode.isEnabled) { touches in
-
-            let mapped = mapping.mapTouches(touches, in: canvasSize)
-            action(mapped)
-
-            if showsTouchIndicators {
-              self.touchesForIndicators = mapped
-            }
-          }
+          TrackpadTouchesView { handleTouches($0) }
         }
 
+        /// Finger location indicators, if enabled
         if effectiveTrackpadMode.isEnabled, showsTouchIndicators {
           TouchIndicatorsView(touches: touchesForIndicators)
         }
 
-        let rect = TrackpadMappedRect.makeRect(
-          in: canvasSize,
-          mapping: mapping,
-          sourceAspectRatio: CGSize.trackpadAspectRatio,
-        )
-
-        if showsGuide, let rect {
-          TrackpadGuideView(mappedRect: rect)
+        if guideVisibility.shouldShowGuide(for: trackpadMode), let guideRect {
+          TrackpadGuideView(mappedRect: guideRect)
         }
 
       }  // END overlay
@@ -60,18 +49,28 @@ struct TrackpadTouchesModifier: ViewModifier {
 }
 
 extension TrackpadTouchesModifier {
-  private var effectiveTrackpadMode: TrackpadMode {
-//    .inactive
-        isPreview ? .active : trackpadMode
+
+  private var guideRect: TrackpadMappedRect? {
+    .makeRect(
+      in: canvasSize,
+      mapping: mapping,
+      sourceAspectRatio: CGSize.trackpadAspectRatio,
+    )
   }
 
-  private var showsGuide: Bool {
-    switch guideVisibility {
-      case .always: true
-      case .drawingMode: effectiveTrackpadMode.isEnabled ? true : false
-      case .never: false
+  private func handleTouches(_ touches: [TouchPoint]) {
+    let mapped = mapping.mapTouches(touches, in: canvasSize)
+    action(mapped)
+
+    if showsTouchIndicators {
+      self.touchesForIndicators = mapped
     }
   }
+  private var effectiveTrackpadMode: TrackpadMode {
+    //    .inactive
+    isPreview ? .active : trackpadMode
+  }
+
 }
 
 extension View {
