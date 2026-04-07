@@ -18,9 +18,10 @@ public struct TrackpadMappedRect: Equatable, Sendable {
   public let size: CGSize
   public let scale: CGFloat
   
-  public var rect: CGRect {
-    CGRect(origin: origin, size: size)
-  }
+  // This never used the above `scale`?
+//  public var rect: CGRect {
+//    CGRect(origin: origin, size: size)
+//  }
 }
 
 extension TrackpadMappedRect {

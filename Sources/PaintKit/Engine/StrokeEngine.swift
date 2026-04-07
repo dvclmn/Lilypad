@@ -36,7 +36,7 @@ extension StrokeEngine {
   /// `began`, appending points on `changed`, and finalising on `ended`.
   public func processTouches(
     _ touches: [TouchPoint]
-    //    with style: BrushStyle,
+      //    with style: BrushStyle,
   ) {
     //    if brushStyle == nil {
     //      brushStyle = style
@@ -85,7 +85,7 @@ extension StrokeEngine {
       position: touch.position,
       speed: touch.magnitude,
       touchOrder: touch.touchOrder,
-      pressure: touch.pressure
+      pressure: touch.pressure,
     )
     activeStrokes[touch.id] = ActiveStroke(
       id: touch.id,
@@ -102,7 +102,7 @@ extension StrokeEngine {
         position: touch.position,
         speed: touch.magnitude,
         touchOrder: touch.touchOrder,
-        pressure: touch.pressure
+        pressure: touch.pressure,
       ))
     activeStrokes[touch.id] = stroke
   }

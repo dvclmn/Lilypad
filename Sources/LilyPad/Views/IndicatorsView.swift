@@ -37,6 +37,7 @@ struct TouchIndicatorsView: View {
         }
         .position(touch.position)
     }
+    .allowsHitTesting(false)
 //    .frame(width: containerSize.width, height: containerSize.height)
   }
 

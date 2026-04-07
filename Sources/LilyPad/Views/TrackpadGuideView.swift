@@ -12,21 +12,21 @@ import SwiftUI
 ///
 /// The rectangle preserves the trackpad's physical aspect ratio (~16:10),
 /// fitted within the canvas size, so users can see the active touch region.
-struct TrackpadGuideView: View {
-
-  let mappedRect: TrackpadMappedRect
-
-  var body: some View {
-    Rectangle()
-      .strokeBorder(
-        Color.mint.opacity(0.3),
-        style: StrokeStyle(lineWidth: 1, dash: [6, 4])
-      )
-      .frame(width: mappedRect.size.width, height: mappedRect.size.height)
-//      .position(
-//        x: mappedRect.origin.x + mappedRect.size.width / 2,
-//        y: mappedRect.origin.y + mappedRect.size.height / 2
+//struct TrackpadGuideView: View {
+//
+//  let mappedRect: TrackpadMappedRect
+//
+//  var body: some View {
+//    Rectangle()
+//      .strokeBorder(
+//        Color.mint.opacity(0.3),
+//        style: StrokeStyle(lineWidth: 1, dash: [6, 4])
 //      )
-      .allowsHitTesting(false)
-  }
-}
+//      .frame(width: mappedRect.size.width, height: mappedRect.size.height)
+////      .position(
+////        x: mappedRect.origin.x + mappedRect.size.width / 2,
+////        y: mappedRect.origin.y + mappedRect.size.height / 2
+////      )
+//      .allowsHitTesting(false)
+//  }
+//}

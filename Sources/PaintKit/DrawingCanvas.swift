@@ -3,33 +3,33 @@
 //  LilyPadDemo
 //
 
-import InteractionKit
 import BasePrimitives
+import InteractionKit
 import SwiftUI
 
 public struct DrawingCanvas: View {
   private let engine: StrokeEngine
 
   /// Controls speed-to-width mapping for all strokes.
-//  private let brushStyle: BrushStyle
+  //  private let brushStyle: BrushStyle
 
   /// Subdivisions per segment in the Catmull-Rom step. Higher = smoother
   /// curves but more points to process. 8 is a good default.
   private let catmullSteps: Int
 
   /// Colours assigned to fingers by their `touchOrder`.
-//  private static let fingerColours: [Color] = [
-//    .white, .blue, .green, .orange, .purple,
-//    .red, .yellow, .cyan, .pink, .mint,
-//  ]
+  //  private static let fingerColours: [Color] = [
+  //    .white, .blue, .green, .orange, .purple,
+  //    .red, .yellow, .cyan, .pink, .mint,
+  //  ]
 
   public init(
     engine: StrokeEngine,
-//    brushStyle: BrushStyle = .init(),
+    //    brushStyle: BrushStyle = .init(),
     catmullSteps: Int = 8,
   ) {
     self.engine = engine
-//    self.brushStyle = brushStyle
+    //    self.brushStyle = brushStyle
     self.catmullSteps = catmullSteps
   }
 
@@ -110,4 +110,3 @@ extension DrawingCanvas {
     return path.generatePath(usesSmoothCurves: true)
   }
 }
-

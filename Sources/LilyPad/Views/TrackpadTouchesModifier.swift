@@ -5,7 +5,8 @@
 //  Created by Dave Coleman on 7/5/2025.
 //
 
-import BasePrimitives
+//import BasePrimitives
+@_spi(Internals) import BasePrimitives
 import InteractionKit
 import SwiftUI
 
@@ -39,12 +40,23 @@ struct TrackpadTouchesModifier: ViewModifier {
         }
 
         if guideVisibility.shouldShowGuide(for: trackpadMode), let guideRect {
-          TrackpadGuideView(mappedRect: guideRect)
+          AreaOutlineShape(colour: .mint, rounding: 4, lineWidth: 1)
+            .frame(width: guideRect.size.width, height: guideRect.size.height)
+            .allowsHitTesting(false)
+          //          .areaOutline(
+          //            colour: .mint,
+          //            rounding: 6,
+          //            lineWidth: 1
+          //          )
+
+          //          TrackpadGuideView(mappedRect: guideRect)
         }
 
       }  // END overlay
 
+      /// Modifier to handle pointer hiding etc for Trackpad mode
       .modifier(TrackpadModeModifier(mode: effectiveTrackpadMode))
+
   }
 }
 
@@ -71,37 +83,4 @@ extension TrackpadTouchesModifier {
     isPreview ? .active : trackpadMode
   }
 
-}
-
-extension View {
-
-  /// Captures trackpad multi-touch input and delivers ordered touch updates.
-  ///
-  /// - Parameters:
-  ///   - isEnabled: Whether touch capture is active. Default `true`.
-  ///   - showIndicators: Show a debug overlay with numbered finger positions.
-  ///     Default `true`.
-  ///   - action: Called each time touches change, with an array of
-  ///     ``TouchPoint`` values sorted by first-contact order.
-  public func trackpadTouches(
-    canvasSize: CGSize,
-    mapping: TouchMapping = .fit,
-    mode: TrackpadMode = .inactive,
-    trackpadMatchesZoom: Bool,
-    guideVisibility: TrackpadGuideVisibility = .always,
-    showsTouchIndicators: Bool = true,
-    perform action: @escaping TouchesUpdate,
-  ) -> some View {
-    self.modifier(
-      TrackpadTouchesModifier(
-        canvasSize: .init(fromCGSize: canvasSize),
-        mapping: mapping,
-        trackpadMode: mode,
-        trackpadMatchesZoom: trackpadMatchesZoom,
-        guideVisibility: guideVisibility,
-        showsTouchIndicators: showsTouchIndicators,
-        action: action,
-      )
-    )
-  }
 }

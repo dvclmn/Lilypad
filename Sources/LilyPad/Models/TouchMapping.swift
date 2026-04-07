@@ -28,6 +28,7 @@ extension TouchMapping {
     in viewSize: Size<CanvasSpace>,
     sourceAspectRatio: CGFloat = CGSize.trackpadAspectRatio,
   ) -> [TouchPoint] {
+    
     /// Guard against invalid sizes
     guard viewSize.width > 0, viewSize.height > 0 else { return touches }
 
@@ -45,8 +46,10 @@ extension TouchMapping {
         switch self {
           case .fit:
             scale = min(viewSize.width / sourceWidth, viewSize.height / sourceHeight)
+
           case .fill:
             scale = max(viewSize.width / sourceWidth, viewSize.height / sourceHeight)
+
           default:
             scale = 1  // unreachable
         }
@@ -54,7 +57,8 @@ extension TouchMapping {
         /// Center the scaled source rect within the view; offsets may be negative for `.fill` (cropping).
         let scaledWidth = sourceWidth * scale
         let scaledHeight = sourceHeight * scale
-        let offsetX = (viewSize.width - scaledWidth) / 2
+        let offsetX = 0.0
+//        let offsetX = (viewSize.width - scaledWidth) / 2
         let offsetY = (viewSize.height - scaledHeight) / 2
 
         return touches.map { point in
