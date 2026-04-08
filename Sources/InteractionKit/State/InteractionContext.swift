@@ -15,7 +15,7 @@ public struct InteractionContext: Sendable {
   public let phase: InteractionPhase
   public let modifiers: Modifiers
 
-  private init(
+  public init(
     interaction: Interaction,
     //    source: InteractionSource,
     phase: InteractionPhase = .none,
@@ -35,5 +35,9 @@ extension InteractionContext {
     return phase.isActive
   }
   
-  public static func make(for )
+//  public static func make(
+//    for transform: TransformAdjustment
+//  ) -> Self? {
+//    guard transform.supportedInteractions
+//  }
 }

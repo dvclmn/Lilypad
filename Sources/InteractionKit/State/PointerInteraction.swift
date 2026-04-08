@@ -9,7 +9,7 @@
 public enum PointerAdjustment: Sendable {
   case tap(Point<ScreenSpace>)
   case hover(Point<ScreenSpace>)
-  case drag(PointerDragPayload)
-//  case drag(Rect<ScreenSpace>)
+//  case drag(PointerDragPayload)
+  case drag(Rect<ScreenSpace>)
 }
 
