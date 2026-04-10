@@ -27,7 +27,7 @@ public typealias DragEventUpdate = (PointerDragPayload?, InteractionPhase) -> Vo
 /// ## Marquee mode
 /// Each callback delivers the rect from drag origin to current pointer.
 /// The modifier draws a marquee overlay. State is cleared on gesture end.
-public struct PointerDragModifier: ViewModifier {
+struct PointerDragModifier: ViewModifier {
 
   @State private var dragState = DragGestureState()
 
@@ -42,13 +42,13 @@ public struct PointerDragModifier: ViewModifier {
   /// — that creates a circular dependency where `onChange` never fires
   /// because `@State` preserves across re-renders.
   let behaviour: PointerDragBehaviour
-
+  let isEnabled: Bool
   let marqueeColour: Color
   let coordinateSpace: CoordinateSpace
   let minimumDistance: CGFloat
   let didUpdatePayload: DragEventUpdate
 
-  public func body(content: Content) -> some View {
+  func body(content: Content) -> some View {
     content
       .gesture(dragGesture, isEnabled: behaviour.isEnabled)
       .drawMarqueeRect(

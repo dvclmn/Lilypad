@@ -27,8 +27,9 @@ extension View {
   ///  - minimumDistance: Minimum drag distance before the gesture activates.
   ///   - didUpdatePayload: Callback receiving the drag payload and phase.
   public func onPointerDragGesture(
-    coordinateSpace: CoordinateSpace = .local,
     behaviour: PointerDragBehaviour,
+    isEnabled: Bool = true,
+    coordinateSpace: CoordinateSpace = .local,
     marqueeColour: Color = .accentColor,
     minimumDistance: CGFloat = 5,
     didUpdatePayload: @escaping DragEventUpdate,
@@ -36,6 +37,7 @@ extension View {
     self.modifier(
       PointerDragModifier(
         behaviour: behaviour,
+        isEnabled: isEnabled,
         marqueeColour: marqueeColour,
         coordinateSpace: coordinateSpace,
         minimumDistance: minimumDistance,

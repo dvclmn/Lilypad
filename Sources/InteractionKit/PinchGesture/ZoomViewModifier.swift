@@ -80,9 +80,8 @@ extension ZoomModifier {
     MagnifyGesture(minimumScaleDelta: 0.01)
       .onChanged { value in
         let isGestureStart = !isGesturing
-        if isGestureStart {
-          lastMagnification = 1
-        }
+        if isGestureStart { lastMagnification = 1 }
+        
         isGesturing = true
 
         let delta = getDelta(from: value)
