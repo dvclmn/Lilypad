@@ -34,7 +34,7 @@ public typealias ZoomUpdate = (Double, InteractionPhase) -> Double?
 /// > Important: Do **not** combine a binding with an override callback.
 /// > That creates two writers for the same value and leads to double-writes.
 /// > Use Mode A *or* Mode B, not both.
-public struct ZoomModifier: ViewModifier {
+public struct PinchGestureModifier: ViewModifier {
   @Environment(\.zoomRange) private var zoomRange
 
   /// Source of truth during the gesture.
@@ -75,7 +75,7 @@ public struct ZoomModifier: ViewModifier {
   }
 }
 
-extension ZoomModifier {
+extension PinchGestureModifier {
   private var magnifyGesture: some Gesture {
     MagnifyGesture(minimumScaleDelta: 0.01)
       .onChanged { value in

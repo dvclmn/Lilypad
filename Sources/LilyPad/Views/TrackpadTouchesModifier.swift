@@ -15,6 +15,7 @@ import SwiftUI
 /// Enable `showIndicators` for a visual debug overlay showing numbered
 /// finger positions on the trackpad.
 struct TrackpadTouchesModifier: ViewModifier {
+  @Environment(\.viewportRect) private var viewportRect
   @State private var touchesForIndicators: [TouchPoint] = []
 
   let canvasSize: Size<CanvasSpace>
@@ -41,7 +42,10 @@ struct TrackpadTouchesModifier: ViewModifier {
 
         if guideVisibility.shouldShowGuide(for: trackpadMode), let guideRect {
           AreaOutlineShape(colour: .mint, rounding: 4, lineWidth: 1)
-            .frame(width: guideRect.size.width, height: guideRect.size.height)
+            .frame(
+              width: guideRect.size.width,
+              height: guideRect.size.height,
+            )
             .allowsHitTesting(false)
           //          .areaOutline(
           //            colour: .mint,
@@ -63,8 +67,11 @@ struct TrackpadTouchesModifier: ViewModifier {
 extension TrackpadTouchesModifier {
 
   private var guideRect: TrackpadMappedRect? {
-    .makeRect(
-      in: canvasSize,
+    guard let viewSize = viewportRect?.size else {
+      return nil
+    }
+    return .makeRect(
+      in: Size(fromCGSize: viewSize),
       mapping: mapping,
       sourceAspectRatio: CGSize.trackpadAspectRatio,
     )

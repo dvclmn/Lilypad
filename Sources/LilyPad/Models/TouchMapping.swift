@@ -8,7 +8,7 @@
 import Foundation
 import InteractionKit
 
-public enum TouchMapping: String, Equatable, Codable, Sendable {
+public enum TouchMapping: Equatable, Codable, Sendable {
   /// Default — guarantees all touches fit within View
   case fit
 
@@ -16,6 +16,8 @@ public enum TouchMapping: String, Equatable, Codable, Sendable {
 
   /// Raw 0-1, no scaling
   case normalised
+  
+//  case custom(in: CGSize)
 }
 
 /// Note: magnitude is recomputed from the transformed velocity

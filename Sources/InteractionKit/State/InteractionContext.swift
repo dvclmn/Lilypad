@@ -24,6 +24,8 @@ public struct InteractionContext: Sendable {
   }
 }
 
+
+
 extension InteractionContext {
   /// True when the last pointer interaction is an active drag.
   public var isPointerDragging: Bool {

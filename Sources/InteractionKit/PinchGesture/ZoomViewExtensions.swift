@@ -15,7 +15,7 @@ extension View {
     isEnabled: Bool = true,
   ) -> some View {
     self.modifier(
-      ZoomModifier(
+      PinchGestureModifier(
         initial: zoom.wrappedValue,
         zoom: zoom,
         isEnabled: isEnabled,
@@ -36,7 +36,7 @@ extension View {
     didUpdateZoom: @escaping ZoomUpdate,
   ) -> some View {
     self.modifier(
-      ZoomModifier(
+      PinchGestureModifier(
         initial: initial,
         zoom: nil,
         isEnabled: isEnabled,
