@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import InteractionKit
+//import InteractionKit
 
 public enum TouchMapping: Equatable, Codable, Sendable {
   /// Default — guarantees all touches fit within View

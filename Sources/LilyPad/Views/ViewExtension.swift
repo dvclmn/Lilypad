@@ -51,7 +51,8 @@ extension View {
   ) -> some View {
     self.modifier(
       TrackpadTouchesModifier(
-        canvasSize: .init(fromCGSize: canvasSize),
+        canvasSize: canvasSize,
+//        canvasSize: .init(fromCGSize: canvasSize),
         mapping: mapping,
         trackpadMode: mode,
         trackpadMatchesZoom: trackpadMatchesZoom,

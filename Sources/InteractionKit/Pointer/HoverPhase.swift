@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import BasePrimitives
 
 extension HoverPhase {
   public var location: CGPoint? {

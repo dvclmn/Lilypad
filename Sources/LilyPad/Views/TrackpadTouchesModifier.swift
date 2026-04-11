@@ -18,7 +18,8 @@ struct TrackpadTouchesModifier: ViewModifier {
   @Environment(\.viewportRect) private var viewportRect
   @State private var touchesForIndicators: [TouchPoint] = []
 
-  let canvasSize: Size<CanvasSpace>
+  let canvasSize: CGSize
+//  let canvasSize: Size<CanvasSpace>
   let mapping: TouchMapping
   let trackpadMode: TrackpadMode
   let trackpadMatchesZoom: Bool
@@ -46,14 +47,7 @@ struct TrackpadTouchesModifier: ViewModifier {
               width: trackpadMappedSize.rect.size.width,
               height: trackpadMappedSize.rect.size.height,
             )
-            .allowsHitTesting(false)
-          //          .areaOutline(
-          //            colour: .mint,
-          //            rounding: 6,
-          //            lineWidth: 1
-          //          )
 
-          //          TrackpadGuideView(mappedRect: guideRect)
         }
 
       }  // END overlay
@@ -68,22 +62,23 @@ extension TrackpadTouchesModifier {
 
   private var trackpadMappedSize: TrackpadMappedRect? {
     guard let viewSize = viewportRect?.size else { return nil }
-    
+
     //  private var trackpadMappedSize: Size<ScreenSpace>? {
     //    guard let viewSize = viewportRect?.size else {
     //      return nil
     //    }
     //    let viewSize = viewportRect?.size
-//    let viewSize: Size<ScreenSpace>
-    
-//    if let viewportSize = viewportRect?.size {
-//      viewSize = .init(fromCGSize: viewportSize)
-//    } else {
-//      viewSize = .init(width: canvasSize.width, height: canvasSize.height)
-//    }
+    //    let viewSize: Size<ScreenSpace>
+
+    //    if let viewportSize = viewportRect?.size {
+    //      viewSize = .init(fromCGSize: viewportSize)
+    //    } else {
+    //      viewSize = .init(width: canvasSize.width, height: canvasSize.height)
+    //    }
     return TrackpadMappedRect.makeRect(
-      in: .init(fromCGSize: viewSize),
-//      in: viewSize,
+      in: viewSize,
+//      in: .init(fromCGSize: viewSize),
+      //      in: viewSize,
       mapping: mapping,
       sourceAspectRatio: CGSize.trackpadAspectRatio,
     )

@@ -27,7 +27,7 @@ let package = Package(
       name: "InteractionKit",
       dependencies: [
         "BasePrimitives"
-//        .product(name: "BasePrimitives", package: "BasePrimitives")
+        //        .product(name: "BasePrimitives", package: "BasePrimitives")
       ],
     ),
     .target(
@@ -39,10 +39,7 @@ let package = Package(
 
     .target(
       name: "LilyPad",
-      dependencies: [
-        .module(.interactionKit),
-        "BasePrimitives"
-      ],
+      dependencies: ["BasePrimitives"],
     ),
     //    .testTarget(
     //      name: "GestureKitTests",

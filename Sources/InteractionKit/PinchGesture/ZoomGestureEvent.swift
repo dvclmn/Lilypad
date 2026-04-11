@@ -5,16 +5,16 @@
 //  Created by Dave Coleman on 1/3/2026.
 //
 
+import BasePrimitives
 import Foundation
 
 /// It may be that later I use this when doing more complex processing on the zoom
 /// value, for zooming around a focus point / cursor etc
 @available(
   *, deprecated, renamed: "ZoomUpdate",
-   message: "Considering deprecating this more verbose Zoom event type, in favour of simple Double value"
+  message: "Considering deprecating this more verbose Zoom event type, in favour of simple Double value"
 )
 public typealias ZoomEventUpdate = (ZoomGestureEvent, InteractionPhase) -> Double?
-
 
 public struct ZoomGestureEvent: Sendable {
 
@@ -38,7 +38,7 @@ public struct ZoomGestureEvent: Sendable {
     proposedZoom: Double,
     magnification: Double,
     magnificationDelta: Double,
-    isGestureStart: Bool
+    isGestureStart: Bool,
   ) {
     self.previousZoom = previousZoom
     self.proposedZoom = proposedZoom
