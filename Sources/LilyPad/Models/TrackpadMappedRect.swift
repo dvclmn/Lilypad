@@ -16,8 +16,7 @@ import Foundation
 /// exactly where trackpad touches will land.
 public struct TrackpadMappedRect: Equatable, Sendable {
   /// Rect in screen space
-  let rect: CGRect
-  //  let rect: Rect<ScreenSpace>
+  public let rect: CGRect
   let scale: CGFloat
   let aspectRatio: CGFloat
 
@@ -62,8 +61,6 @@ extension TrackpadMappedRect {
   /// not local canvas/artwork/document space.
   public static func makeRect(
     in viewSize: CGSize,
-    //    in viewSize: Size<ScreenSpace>,
-    //    in viewSize: Size<CanvasSpace>,
     mapping: TouchMapping,
     sourceAspectRatio: CGFloat = CGSize.trackpadAspectRatio,
   ) -> TrackpadMappedRect? {

@@ -44,18 +44,18 @@ extension View {
     canvasSize: CGSize,
     mapping: TouchMapping = .fit,
     mode: TrackpadMode = .inactive,
-    trackpadMatchesZoom: Bool,
+//    trackpadMatchesZoom: Bool,
     guideVisibility: TrackpadGuideVisibility = .always,
     showsTouchIndicators: Bool = true,
-    perform action: @escaping TouchesUpdate,
+    perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
   ) -> some View {
     self.modifier(
       TrackpadTouchesModifier(
         canvasSize: canvasSize,
-//        canvasSize: .init(fromCGSize: canvasSize),
+        //        canvasSize: .init(fromCGSize: canvasSize),
         mapping: mapping,
         trackpadMode: mode,
-        trackpadMatchesZoom: trackpadMatchesZoom,
+//        trackpadMatchesZoom: trackpadMatchesZoom,
         guideVisibility: guideVisibility,
         showsTouchIndicators: showsTouchIndicators,
         action: action,

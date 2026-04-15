@@ -51,6 +51,10 @@ extension StrokeEngine {
       }
     }
   }
+  
+  public func setCompleted(_ strokes: [Stroke]) {
+    self.completedStrokes = strokes
+  }
 
   /// Remove all completed strokes.
   public func clear() {

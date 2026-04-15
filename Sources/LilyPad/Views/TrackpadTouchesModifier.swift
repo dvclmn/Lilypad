@@ -5,27 +5,24 @@
 //  Created by Dave Coleman on 7/5/2025.
 //
 
-//import BasePrimitives
 @_spi(Internals) import BasePrimitives
-//import InteractionKit
 import SwiftUI
 
 /// View modifier that overlays trackpad touch capture on any view.
 ///
-/// Enable `showIndicators` for a visual debug overlay showing numbered
-/// finger positions on the trackpad.
+/// Enable `showIndicators` for a visual debug overlay showing
+/// numbered finger positions on the trackpad.
 struct TrackpadTouchesModifier: ViewModifier {
   @Environment(\.viewportRect) private var viewportRect
   @State private var touchesForIndicators: [TouchPoint] = []
 
   let canvasSize: CGSize
-//  let canvasSize: Size<CanvasSpace>
   let mapping: TouchMapping
   let trackpadMode: TrackpadMode
-  let trackpadMatchesZoom: Bool
+  //  let trackpadMatchesZoom: Bool
   let guideVisibility: TrackpadGuideVisibility
   let showsTouchIndicators: Bool
-  let action: TouchesUpdate
+  let action: ([TouchPoint], TrackpadMappedRect) -> Void
 
   func body(content: Content) -> some View {
     content
@@ -41,13 +38,10 @@ struct TrackpadTouchesModifier: ViewModifier {
           TouchIndicatorsView(touches: touchesForIndicators)
         }
 
-        if guideVisibility.shouldShowGuide(for: trackpadMode), let trackpadMappedSize {
-          AreaOutlineShape(colour: .mint, rounding: 4, lineWidth: 1)
-            .frame(
-              width: trackpadMappedSize.rect.size.width,
-              height: trackpadMappedSize.rect.size.height,
-            )
-
+        if let viewportRect {
+          TrackpadGuide(viewportRect)
+        } else {
+          StateView("No Viewport Rect found in Environment", icon: .emoji("⚠️"))
         }
 
       }  // END overlay
@@ -55,43 +49,49 @@ struct TrackpadTouchesModifier: ViewModifier {
       /// Modifier to handle pointer hiding etc for Trackpad mode
       .modifier(TrackpadModeModifier(mode: effectiveTrackpadMode))
 
+    //      .viewportRectIndicator()
   }
 }
 
 extension TrackpadTouchesModifier {
 
-  private var trackpadMappedSize: TrackpadMappedRect? {
-    guard let viewSize = viewportRect?.size else { return nil }
+  @ViewBuilder
+  private func TrackpadGuide(_ viewportRect: CGRect) -> some View {
+    if guideVisibility.shouldShowGuide(for: trackpadMode),
+      let mappedSize = trackpadMappedSize(in: viewportRect)
+    {
+      AreaOutlineShape(
+        colour: .mint,
+        rounding: 4,
+        lineWidth: 1,
+      )
+      .frame(
+        width: mappedSize.rect.size.width,
+        height: mappedSize.rect.size.height,
+      )
+    }
+  }
 
-    //  private var trackpadMappedSize: Size<ScreenSpace>? {
-    //    guard let viewSize = viewportRect?.size else {
-    //      return nil
-    //    }
-    //    let viewSize = viewportRect?.size
-    //    let viewSize: Size<ScreenSpace>
+  private func trackpadMappedSize(in viewportRect: CGRect) -> TrackpadMappedRect? {
+    let viewSize = viewportRect.size
 
-    //    if let viewportSize = viewportRect?.size {
-    //      viewSize = .init(fromCGSize: viewportSize)
-    //    } else {
-    //      viewSize = .init(width: canvasSize.width, height: canvasSize.height)
-    //    }
     return TrackpadMappedRect.makeRect(
       in: viewSize,
-//      in: .init(fromCGSize: viewSize),
-      //      in: viewSize,
       mapping: mapping,
       sourceAspectRatio: CGSize.trackpadAspectRatio,
     )
   }
 
   private func handleTouches(_ touches: [TouchPoint]) {
-    guard let trackpadMappedSize else { return }
+    guard let viewportRect,
+      let mappedSize = trackpadMappedSize(in: viewportRect)
+    else { return }
     //    let mapped = mapping.mapTouches(touches, in: trackpadMappedSize)
     let mapped = mapping.mapTouches(
       touches,
-      in: trackpadMappedSize,
+      in: mappedSize,
     )
-    action(mapped)
+    action(mapped, mappedSize)
 
     if showsTouchIndicators {
       self.touchesForIndicators = mapped

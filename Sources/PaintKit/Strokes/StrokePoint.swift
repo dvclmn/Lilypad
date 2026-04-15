@@ -28,4 +28,27 @@ public struct StrokePoint: Hashable, Codable, Sendable {
   /// Range is 0.0 (no pressure) to 1.0 (maximum pressure).
   /// Useful for pressure-sensitive brush rendering (harder → thicker/darker).
   public var pressure: CGFloat
+  
+  public init(
+    position: CGPoint,
+    speed: CGFloat,
+    touchOrder: Int,
+    pressure: CGFloat = 0
+  ) {
+    self.position = position
+    self.speed = speed
+    self.touchOrder = touchOrder
+    self.pressure = pressure
+  }
+}
+
+extension StrokePoint {
+  public static func makeQuick(x: CGFloat, y: CGFloat) -> Self {
+    self.init(
+      position: CGPoint(x: x, y: y),
+      speed: 1,
+      touchOrder: 0,
+      pressure: 0
+    )
+  }
 }
