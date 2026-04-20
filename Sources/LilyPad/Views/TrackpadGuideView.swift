@@ -5,6 +5,7 @@
 //  Created by Dave Coleman on 6/4/2026.
 //
 
+@_spi(Internals) import BasePrimitives
 import SwiftUI
 
 /// Renders a rectangle showing exactly where trackpad touches
@@ -12,21 +13,32 @@ import SwiftUI
 ///
 /// The rectangle preserves the trackpad's physical aspect ratio (~16:10),
 /// fitted within the canvas size, so users can see the active touch region.
-//struct TrackpadGuideView: View {
-//
-//  let mappedRect: TrackpadMappedRect
-//
-//  var body: some View {
-//    Rectangle()
-//      .strokeBorder(
-//        Color.mint.opacity(0.3),
-//        style: StrokeStyle(lineWidth: 1, dash: [6, 4])
-//      )
-//      .frame(width: mappedRect.size.width, height: mappedRect.size.height)
-////      .position(
-////        x: mappedRect.origin.x + mappedRect.size.width / 2,
-////        y: mappedRect.origin.y + mappedRect.size.height / 2
-////      )
-//      .allowsHitTesting(false)
-//  }
-//}
+struct TrackpadGuideView: View {
+  @Environment(\.viewportRect) private var viewportRect
+
+  let context: TrackpadMappingContext
+
+  var body: some View {
+    if let mappedSize {
+      AreaOutlineShape(
+        colour: .mint,
+        rounding: 4,
+        lineWidth: 1,
+      )
+      .frame(
+        width: mappedSize.rect.size.width,
+        height: mappedSize.rect.size.height,
+      )
+    }
+  }
+}
+
+extension TrackpadGuideView {
+  private var mappedSize: TrackpadMappedRect? {
+    guard context.guide.shouldShowGuide(for: context.mode),
+      let viewportRect,
+      let mappedSize = context.mappedSize(in: viewportRect)
+    else { return nil }
+    return mappedSize
+  }
+}

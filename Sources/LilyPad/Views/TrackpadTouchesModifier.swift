@@ -38,7 +38,7 @@ struct TrackpadTouchesModifier: ViewModifier {
         }
 
         if let viewportRect {
-          TrackpadGuide(viewportRect)
+          TrackpadGuideView(context: <#T##TrackpadMappingContext#>)
         } else {
           StateView("No Viewport Rect found in Environment", icon: .emoji("⚠️"))
         }
@@ -53,37 +53,13 @@ struct TrackpadTouchesModifier: ViewModifier {
 }
 
 extension TrackpadTouchesModifier {
-
-  @ViewBuilder
-  private func TrackpadGuide(_ viewportRect: CGRect) -> some View {
-    if guideVisibility.shouldShowGuide(for: trackpadMode),
-      let mappedSize = trackpadMappedSize(in: viewportRect)
-    {
-      AreaOutlineShape(
-        colour: .mint,
-        rounding: 4,
-        lineWidth: 1,
-      )
-      .frame(
-        width: mappedSize.rect.size.width,
-        height: mappedSize.rect.size.height,
-      )
-    }
-  }
-
-  private func trackpadMappedSize(in viewportRect: CGRect) -> TrackpadMappedRect? {
-    let viewSize = viewportRect.size
-
-    return TrackpadMappedRect.makeRect(
-      in: viewSize,
-      mapping: mapping,
-      sourceAspectRatio: CGSize.trackpadAspectRatio,
-    )
+  private var context: TrackpadMappingContext {
+    .init(guide: guideVisibility, mode: trackpadMode, mapping: mapping)
   }
 
   private func handleTouches(_ touches: [TouchPoint]) {
     guard let viewportRect,
-      let mappedSize = trackpadMappedSize(in: viewportRect)
+      let mappedSize = context.mappedSize(in: viewportRect)
     else { return }
     let mapped = mapping.mapTouches(
       touches,
