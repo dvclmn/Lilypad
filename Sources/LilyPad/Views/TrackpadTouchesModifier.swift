@@ -19,7 +19,6 @@ struct TrackpadTouchesModifier: ViewModifier {
   let canvasSize: CGSize
   let mapping: TouchMapping
   let trackpadMode: TrackpadMode
-  //  let trackpadMatchesZoom: Bool
   let guideVisibility: TrackpadGuideVisibility
   let showsTouchIndicators: Bool
   let action: ([TouchPoint], TrackpadMappedRect) -> Void
@@ -86,7 +85,6 @@ extension TrackpadTouchesModifier {
     guard let viewportRect,
       let mappedSize = trackpadMappedSize(in: viewportRect)
     else { return }
-    //    let mapped = mapping.mapTouches(touches, in: trackpadMappedSize)
     let mapped = mapping.mapTouches(
       touches,
       in: mappedSize,

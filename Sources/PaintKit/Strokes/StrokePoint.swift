@@ -43,7 +43,7 @@ public struct StrokePoint: Hashable, Codable, Sendable {
 }
 
 extension StrokePoint {
-  public static func makeQuick(x: CGFloat, y: CGFloat) -> Self {
+  public static func at(x: CGFloat, y: CGFloat) -> Self {
     self.init(
       position: CGPoint(x: x, y: y),
       speed: 1,

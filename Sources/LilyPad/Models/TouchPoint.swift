@@ -31,7 +31,7 @@ public struct TouchPoint: Identifiable, Hashable, Sendable {
   public let touchOrder: Int
 
   /// Position in the configured coordinate space.
-  public let position: CGPoint
+  public var position: CGPoint
 
   /// Smoothed velocity in points per second (or normalised units/s).
   public let velocity: CGVector
@@ -77,5 +77,13 @@ public struct TouchPoint: Identifiable, Hashable, Sendable {
     self.stage = stage
     self.phase = phase
     self.isResting = isResting
+  }
+}
+
+extension TouchPoint {
+  public func withPosition(_ position: CGPoint) -> Self {
+    var result = self
+    result.position = position
+    return result
   }
 }

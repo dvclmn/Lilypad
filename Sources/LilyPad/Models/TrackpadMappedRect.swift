@@ -15,6 +15,7 @@ import Foundation
 /// the target view size. Use this to render a visual guide showing
 /// exactly where trackpad touches will land.
 public struct TrackpadMappedRect: Equatable, Sendable {
+
   /// Rect in screen space
   public let rect: CGRect
   let scale: CGFloat
@@ -29,29 +30,6 @@ public struct TrackpadMappedRect: Equatable, Sendable {
     self.scale = scale
     self.aspectRatio = aspectRatio
   }
-
-  //  public init(
-  //    origin: Point<ScreenSpace>,
-  //    size: Size<ScreenSpace>,
-  //    scale: CGFloat,
-  //    aspectRatio: CGFloat
-  //  ) {
-  //    self.rect = .init(origin: origin, size: size)
-  //    self.scale = scale
-  //    self.aspectRatio = aspectRatio
-  //  }
-  //}
-  //    public let origin: CGPoint
-  //  public let size: CGSize
-  //  public let scale: CGFloat
-  //
-  //
-  //
-  //
-  //  // This never used the above `scale`?
-  //  //  public var rect: CGRect {
-  //  //    CGRect(origin: origin, size: size)
-  //  //  }
 }
 
 extension TrackpadMappedRect {

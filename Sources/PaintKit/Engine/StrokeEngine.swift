@@ -51,7 +51,7 @@ extension StrokeEngine {
       }
     }
   }
-  
+
   public func setCompleted(_ strokes: [Stroke]) {
     self.completedStrokes = strokes
   }
@@ -112,9 +112,7 @@ extension StrokeEngine {
   }
 
   private func finishStroke(for touch: TouchPoint) {
-    //    defer { brushStyle = nil }
     guard let stroke = activeStrokes.removeValue(forKey: touch.id)
-    //      let style = brushStyle
     else { return }
     guard stroke.points.count >= 2 else { return }
 
