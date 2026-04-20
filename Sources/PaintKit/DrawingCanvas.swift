@@ -4,12 +4,12 @@
 //
 
 import BasePrimitives
-//import InteractionKit
 import SwiftUI
 
 public struct DrawingCanvas: View {
   private let engine: StrokeEngine
 
+  let providerList: [any StrokesProvider]
   /// Controls speed-to-width mapping for all strokes.
   //  private let brushStyle: BrushStyle
 
@@ -25,10 +25,12 @@ public struct DrawingCanvas: View {
 
   public init(
     engine: StrokeEngine,
+    providerList: [any StrokesProvider],
     //    brushStyle: BrushStyle = .init(),
     catmullSteps: Int = 8,
   ) {
     self.engine = engine
+    self.providerList = providerList
     //    self.brushStyle = brushStyle
     self.catmullSteps = catmullSteps
   }
@@ -42,20 +44,16 @@ public struct DrawingCanvas: View {
       let bgRect = CGRect(origin: .zero, size: size)
       context.fill(Path(bgRect), with: .color(.black))
 
-      for stroke in engine.filteredStrokes(using: .distance(minSeparation: 6)) {
-        renderStroke(
-          for: .completed(stroke.style),
-          points: stroke.points,
-          touchOrder: stroke.touchOrder,
-          in: &context,
-        )
+      for provider in providerList {
+        renderProvider(provider, in: context)
       }
+
       for (_, stroke) in engine.activeStrokes {
         renderStroke(
           for: .active,
           points: stroke.points,
           touchOrder: stroke.touchOrder,
-          in: &context,
+          in: context,
         )
       }
     }
@@ -64,12 +62,27 @@ public struct DrawingCanvas: View {
 
 extension DrawingCanvas {
 
+  private func renderProvider(
+    _ provider: any StrokesProvider,
+    in context: GraphicsContext,
+  ) {
+    for stroke in provider.filteredStrokes(using: .distance(minSeparation: 6)) {
+      //    for stroke in engine.filteredStrokes(using: .distance(minSeparation: 6)) {
+      renderStroke(
+        for: .completed(stroke.style),
+        points: stroke.points,
+        touchOrder: stroke.touchOrder,
+        in: context,
+      )
+    }
+  }
+
   private func renderStroke(
     for phase: StrokePhase,
     points: [StrokePoint],
     touchOrder: Int,
 
-    in context: inout GraphicsContext,
+    in context: GraphicsContext,
   ) {
     guard points.count >= 2 else { return }
 
