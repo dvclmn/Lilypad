@@ -33,26 +33,24 @@ struct TrackpadTouchesModifier: ViewModifier {
         }
 
         /// Finger location indicators, if enabled
-        if effectiveTrackpadMode.isEnabled, showsTouchIndicators {
+        if showsIndicators {
           TouchIndicatorsView(touches: touchesForIndicators)
         }
 
-        if let viewportRect {
-          TrackpadGuideView(context: <#T##TrackpadMappingContext#>)
-        } else {
-          StateView("No Viewport Rect found in Environment", icon: .emoji("⚠️"))
-        }
+        TrackpadGuideView(context: context)
 
       }  // END overlay
 
       /// Modifier to handle pointer hiding etc for Trackpad mode
       .modifier(TrackpadModeModifier(mode: effectiveTrackpadMode))
-
-    //      .viewportRectIndicator()
   }
 }
 
 extension TrackpadTouchesModifier {
+  private var showsIndicators: Bool {
+    showsTouchIndicators && mapping != .normalised && effectiveTrackpadMode.isEnabled
+  }
+
   private var context: TrackpadMappingContext {
     .init(guide: guideVisibility, mode: trackpadMode, mapping: mapping)
   }
@@ -72,7 +70,6 @@ extension TrackpadTouchesModifier {
     }
   }
   private var effectiveTrackpadMode: TrackpadMode {
-    //    .inactive
     isPreview ? .active : trackpadMode
   }
 

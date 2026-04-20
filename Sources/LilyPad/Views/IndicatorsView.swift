@@ -14,7 +14,6 @@ import SwiftUI
 struct TouchIndicatorsView: View {
 
   let touches: [TouchPoint]
-//  let containerSize: CGSize
 
   private let indicatorDiameter: CGFloat = 40
 
@@ -38,7 +37,6 @@ struct TouchIndicatorsView: View {
         .position(touch.position)
     }
     .allowsHitTesting(false)
-//    .frame(width: containerSize.width, height: containerSize.height)
   }
 
   private func positionLabel(_ point: CGPoint) -> String {
