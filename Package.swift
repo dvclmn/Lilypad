@@ -24,7 +24,10 @@ let package = Package(
   targets: [
     .target(
       name: "Lilypad",
-      dependencies: ["BasePrimitives"],
+      dependencies: [
+        .product(name: "BasePrimitives", package: "BasePrimitives"),
+        .product(name: "CoreUtilities", package: "BasePrimitives"),
+      ],
     ),
     .target(
       name: "PaintKit",

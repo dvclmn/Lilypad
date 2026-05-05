@@ -9,7 +9,7 @@ import SwiftUI
 public struct DrawingCanvas: View {
   private let engine: StrokeEngine
 
-  let providerList: [any StrokesProvider]
+  let layers: [any DrawingLayer]
   /// Controls speed-to-width mapping for all strokes.
   //  private let brushStyle: BrushStyle
 
@@ -17,20 +17,14 @@ public struct DrawingCanvas: View {
   /// curves but more points to process. 8 is a good default.
   private let catmullSteps: Int
 
-  /// Colours assigned to fingers by their `touchOrder`.
-  //  private static let fingerColours: [Color] = [
-  //    .white, .blue, .green, .orange, .purple,
-  //    .red, .yellow, .cyan, .pink, .mint,
-  //  ]
-
   public init(
     engine: StrokeEngine,
-    providerList: [any StrokesProvider],
+    layers: [any DrawingLayer],
     //    brushStyle: BrushStyle = .init(),
     catmullSteps: Int = 8,
   ) {
     self.engine = engine
-    self.providerList = providerList
+    self.layers = layers
     //    self.brushStyle = brushStyle
     self.catmullSteps = catmullSteps
   }
@@ -38,14 +32,16 @@ public struct DrawingCanvas: View {
   public var body: some View {
     Canvas(
       opaque: true,
-      rendersAsynchronously: true,
-    ) { context, size in
+//      rendersAsynchronously: true,
+    ) {
+      context,
+      size in
 
       let bgRect = CGRect(origin: .zero, size: size)
       context.fill(Path(bgRect), with: .color(.black))
 
-      for provider in providerList {
-        renderProvider(provider, in: context)
+      for layer in layers {
+        renderLayer(layer, in: context)
       }
 
       for (_, stroke) in engine.activeStrokes {
@@ -56,18 +52,26 @@ public struct DrawingCanvas: View {
           in: context,
         )
       }
+
+//      context.drawGrid(
+//        domain: .automatic,
+//        in: size,
+//      )
     }
+//    .environment(\.unitSize, CGSize(30, 40))
+//    .environment(\.gridDimensions, .init(40, 20))
+//    .environment(\.gridLineColour, .orange)
   }
 }
 
 extension DrawingCanvas {
 
-  private func renderProvider(
-    _ provider: any StrokesProvider,
+  private func renderLayer(
+    _ layer: any DrawingLayer,
     in context: GraphicsContext,
   ) {
-    for stroke in provider.filteredStrokes(using: .distance(minSeparation: 6)) {
-      //    for stroke in engine.filteredStrokes(using: .distance(minSeparation: 6)) {
+    guard layer.metadata.isVisible else { return }
+    for stroke in layer.filteredStrokes(using: .distance(minSeparation: 6)) {
       renderStroke(
         for: .completed(stroke.style),
         points: stroke.points,

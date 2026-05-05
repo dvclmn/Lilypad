@@ -6,7 +6,7 @@
 //
 
 import AppKit
-//import InteractionKit
+import InputPrimitives
 import BasePrimitives
 
 /// Processes raw `NSTouch` events into ordered `TouchPoint` values with

@@ -1,5 +1,5 @@
 //
-//  ViewExtension.swift
+//  TrackpadTouches+ViewExt.swift
 //  InteractionKit
 //
 //  Created by Dave Coleman on 6/4/2026.
@@ -42,9 +42,10 @@ extension View {
   ///     are in canvas coordinate space as specified by `canvasSize` and `mapping`.
   public func trackpadTouches(
     canvasSize: CGSize,
+    zoomLevel: Double,
+    zoomRange: ClosedRange<Double>,
     mapping: TouchMapping = .fit,
     mode: TrackpadMode = .inactive,
-//    trackpadMatchesZoom: Bool,
     guideVisibility: TrackpadGuideVisibility = .always,
     showsTouchIndicators: Bool = true,
     perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
@@ -52,10 +53,10 @@ extension View {
     self.modifier(
       TrackpadTouchesModifier(
         canvasSize: canvasSize,
-        //        canvasSize: .init(fromCGSize: canvasSize),
+        zoomLevel: zoomLevel,
+        zoomRange: zoomRange,
         mapping: mapping,
         trackpadMode: mode,
-//        trackpadMatchesZoom: trackpadMatchesZoom,
         guideVisibility: guideVisibility,
         showsTouchIndicators: showsTouchIndicators,
         action: action,

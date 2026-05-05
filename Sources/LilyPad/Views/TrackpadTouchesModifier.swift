@@ -6,6 +6,7 @@
 //
 
 @_spi(Internals) import BasePrimitives
+import CoreUtilities
 import SwiftUI
 
 /// View modifier that overlays trackpad touch capture on any view.
@@ -17,6 +18,8 @@ struct TrackpadTouchesModifier: ViewModifier {
   @State private var touchesForIndicators: [TouchPoint] = []
 
   let canvasSize: CGSize
+  let zoomLevel: Double
+  let zoomRange: ClosedRange<Double>
   let mapping: TouchMapping
   let trackpadMode: TrackpadMode
   let guideVisibility: TrackpadGuideVisibility
@@ -27,17 +30,26 @@ struct TrackpadTouchesModifier: ViewModifier {
     content
       .overlay {
 
-        /// NSView that detects touches
-        if effectiveTrackpadMode.isEnabled {
-          TrackpadTouchesView { handleTouches($0) }
-        }
+        if let viewportRect {
+          /// NSView that detects touches
+          if effectiveTrackpadMode.isEnabled {
+            TrackpadTouchesView { handleTouches($0, viewportRect: viewportRect) }
+          }
 
-        /// Finger location indicators, if enabled
-        if showsIndicators {
-          TouchIndicatorsView(touches: touchesForIndicators)
-        }
+          /// Finger location indicators, if enabled
+          if showsIndicators {
+            TouchIndicatorsView(touches: touchesForIndicators)
+          }
 
-        TrackpadGuideView(context: context)
+          TrackpadGuideView(
+            context: context,
+            zoomLevel: zoomLevel,
+            zoomRange: zoomRange,
+          )
+
+        } else {
+          Text("Lilypad requires that a `viewportRect` value be present in the Environment.")
+        }
 
       }  // END overlay
 
@@ -55,10 +67,11 @@ extension TrackpadTouchesModifier {
     .init(guide: guideVisibility, mode: trackpadMode, mapping: mapping)
   }
 
-  private func handleTouches(_ touches: [TouchPoint]) {
-    guard let viewportRect,
-      let mappedSize = context.mappedSize(in: viewportRect)
-    else { return }
+  private func handleTouches(
+    _ touches: [TouchPoint],
+    viewportRect: CGRect,
+  ) {
+    guard let mappedSize = context.mappedSize(in: viewportRect) else { return }
     let mapped = mapping.mapTouches(
       touches,
       in: mappedSize,
@@ -70,7 +83,7 @@ extension TrackpadTouchesModifier {
     }
   }
   private var effectiveTrackpadMode: TrackpadMode {
-    isPreview ? .active : trackpadMode
+    isPreview ? .active(hidesPointer: false) : trackpadMode
   }
 
 }

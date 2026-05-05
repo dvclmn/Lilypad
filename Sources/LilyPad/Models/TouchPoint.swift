@@ -7,7 +7,7 @@
 
 import CoreGraphics
 import Foundation
-//import InteractionKit
+import InputPrimitives
 import BasePrimitives
 
 /// A single trackpad touch with position, velocity, and stable ordering.
