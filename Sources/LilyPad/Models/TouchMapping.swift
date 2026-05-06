@@ -47,18 +47,21 @@ extension TouchMapping {
           let ny = point.position.y
           let xSource = nx * sourceWidth
           let ySource = ny * sourceHeight
+
           let mappedPosition = CGPoint(
             x: origin.x + xSource * scale,
-            y: origin.y + (sourceHeight - ySource) * scale,  // flip Y to top-left origin
+            // flip Y to top-left origin
+            y: origin.y + (sourceHeight - ySource) * scale,
           )
 
-          /// Velocity should follow the same transform: scale X by `scale`, Y by `sourceHeight * scale`, and flip Y.
+          /// Velocity should follow the same transform:
+          /// scale X by `scale`, Y by `sourceHeight * scale`, and flip Y.
           let mappedVelocity = CGVector(
             dx: point.velocity.dx * scale,
             dy: -point.velocity.dy * sourceHeight * scale,
           )
 
-          /// Scalar speed should be derived from the transformed velocity vector.
+          /// Scalar speed derived from the transformed velocity vector.
           let mappedMagnitude = hypot(mappedVelocity.dx, mappedVelocity.dy)
 
           return TouchPoint(

@@ -29,10 +29,10 @@ let package = Package(
         .product(name: "CoreUtilities", package: "BasePrimitives"),
       ],
     ),
-    .target(
-      name: "PaintKit",
-      dependencies: ["Lilypad"],
-    ),
+//    .target(
+//      name: "PaintKit",
+//      dependencies: ["Lilypad"],
+//    ),
 
   ],
 )
