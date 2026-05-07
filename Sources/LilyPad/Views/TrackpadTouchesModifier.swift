@@ -14,7 +14,6 @@ import SwiftUI
 /// Enable `showIndicators` for a visual debug overlay showing
 /// numbered finger positions on the trackpad.
 struct TrackpadTouchesModifier: ViewModifier {
-  @Environment(\.viewportRect) private var viewportRect
   @State private var touchesForIndicators: [TouchPoint] = []
 
   let canvasSize: CGSize
@@ -24,16 +23,19 @@ struct TrackpadTouchesModifier: ViewModifier {
   let trackpadMode: TrackpadMode
   let guideVisibility: TrackpadGuideVisibility
   let showsTouchIndicators: Bool
+  let viewportRectWaitDuration: TimeInterval
   let action: ([TouchPoint], TrackpadMappedRect) -> Void
 
   func body(content: Content) -> some View {
     content
       .overlay {
 
-        if let viewportRect {
+        ViewportRectLoadingView(waitDuration: viewportRectWaitDuration) { viewportRect in
           /// NSView that detects touches
           if trackpadMode.isEnabled {
-            TrackpadTouchesView { handleTouches($0, viewportRect: viewportRect) }
+            TrackpadTouchesView {
+              handleTouches($0, viewportRect: viewportRect)
+            }
           }
 
           /// Finger location indicators, if enabled
@@ -46,9 +48,6 @@ struct TrackpadTouchesModifier: ViewModifier {
             zoomLevel: zoomLevel,
             zoomRange: zoomRange,
           )
-
-        } else {
-          Text("Lilypad requires that a `viewportRect` value be present in the Environment.")
         }
 
       }  // END overlay
@@ -82,8 +81,65 @@ extension TrackpadTouchesModifier {
       self.touchesForIndicators = mapped
     }
   }
-//  private var effectiveTrackpadMode: TrackpadMode {
-//    isPreview ? .active(hidesPointer: false) : trackpadMode
-//  }
+}
 
+private struct ViewportRectLoadingView<ResolvedContent: View>: View {
+  @Environment(\.viewportRect) private var viewportRect
+  @State private var hasFinishedWaiting: Bool = false
+
+  let waitDuration: TimeInterval
+  let resolvedContent: (CGRect) -> ResolvedContent
+
+  init(
+    waitDuration: TimeInterval,
+    @ViewBuilder resolvedContent: @escaping (CGRect) -> ResolvedContent,
+  ) {
+    self.waitDuration = waitDuration
+    self.resolvedContent = resolvedContent
+  }
+
+  var body: some View {
+    ZStack {
+      if hasFinishedWaiting {
+        if let viewportRect {
+          resolvedContent(viewportRect)
+            .transition(.opacity)
+        } else {
+          fallbackMessage
+            .transition(.opacity)
+        }
+      } else {
+        ProgressView("Loading...")
+          .transition(.opacity)
+      }
+    }
+    .animation(.easeInOut(duration: 0.2), value: hasFinishedWaiting)
+    .animation(.easeInOut(duration: 0.2), value: viewportRect != nil)
+    .task(id: clampedWaitDuration) {
+      hasFinishedWaiting = false
+
+      guard clampedWaitDuration > 0 else {
+        hasFinishedWaiting = true
+        return
+      }
+
+      try? await Task.sleep(for: .seconds(clampedWaitDuration))
+
+      guard !Task.isCancelled else { return }
+      withAnimation(.easeInOut(duration: 0.2)) {
+        hasFinishedWaiting = true
+      }
+    }
+  }
+
+  private var clampedWaitDuration: TimeInterval {
+    guard waitDuration.isFinite else { return 0 }
+    return max(0, waitDuration)
+  }
+
+  private var fallbackMessage: some View {
+    Text("Lilypad is still waiting for a `viewportRect` value in the Environment.")
+      .font(.callout)
+      .foregroundStyle(.secondary)
+  }
 }

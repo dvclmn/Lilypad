@@ -37,6 +37,8 @@ extension View {
   ///     - `.never`: Guide never visible.
   ///   - showsTouchIndicators: When `true` (default), displays numbered overlays showing
   ///     each finger's position and touch order.
+  ///   - viewportRectWaitDuration: How long to show a loading state while waiting for
+  ///     a `viewportRect` value to arrive in the environment.
   ///   - action: Called each time touches change, receiving an array of ``TouchPoint``
   ///     values sorted by first-contact order (finger 1, finger 2, etc.). Touch positions
   ///     are in canvas coordinate space as specified by `canvasSize` and `mapping`.
@@ -48,6 +50,7 @@ extension View {
     mode: TrackpadMode = .inactive,
     guideVisibility: TrackpadGuideVisibility = .always,
     showsTouchIndicators: Bool = true,
+    viewportRectWaitDuration: TimeInterval = 1,
     perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
   ) -> some View {
     self.modifier(
@@ -59,6 +62,7 @@ extension View {
         trackpadMode: mode,
         guideVisibility: guideVisibility,
         showsTouchIndicators: showsTouchIndicators,
+        viewportRectWaitDuration: viewportRectWaitDuration,
         action: action,
       )
     )

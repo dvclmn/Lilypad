@@ -15,7 +15,7 @@ public typealias TouchesUpdate = ([TouchPoint]) -> Void
 /// NSViewRepresentable bridge that hosts ``TrackpadTouchesNSView``
 /// inside a SwiftUI view hierarchy.
 struct TrackpadTouchesView: NSViewRepresentable {
-//  var isActive: Bool
+
   var didUpdateTouches: TouchesUpdate
 
   func makeNSView(context: Context) -> TrackpadTouchesNSView {
