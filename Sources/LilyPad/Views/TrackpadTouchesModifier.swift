@@ -30,7 +30,7 @@ struct TrackpadTouchesModifier: ViewModifier {
     content
       .overlay {
 
-        ViewportRectLoadingView(waitDuration: viewportRectWaitDuration) { viewportRect in
+        RectLoadingView(waitDuration: viewportRectWaitDuration) { viewportRect in
           /// NSView that detects touches
           if trackpadMode.isEnabled {
             TrackpadTouchesView {
@@ -80,66 +80,5 @@ extension TrackpadTouchesModifier {
     if showsTouchIndicators {
       self.touchesForIndicators = mapped
     }
-  }
-}
-
-private struct ViewportRectLoadingView<ResolvedContent: View>: View {
-  @Environment(\.viewportRect) private var viewportRect
-  @State private var hasFinishedWaiting: Bool = false
-
-  let waitDuration: TimeInterval
-  let resolvedContent: (CGRect) -> ResolvedContent
-
-  init(
-    waitDuration: TimeInterval,
-    @ViewBuilder resolvedContent: @escaping (CGRect) -> ResolvedContent,
-  ) {
-    self.waitDuration = waitDuration
-    self.resolvedContent = resolvedContent
-  }
-
-  var body: some View {
-    ZStack {
-      if hasFinishedWaiting {
-        if let viewportRect {
-          resolvedContent(viewportRect)
-            .transition(.opacity)
-        } else {
-          fallbackMessage
-            .transition(.opacity)
-        }
-      } else {
-        ProgressView("Loading...")
-          .transition(.opacity)
-      }
-    }
-    .animation(.easeInOut(duration: 0.2), value: hasFinishedWaiting)
-    .animation(.easeInOut(duration: 0.2), value: viewportRect != nil)
-    .task(id: clampedWaitDuration) {
-      hasFinishedWaiting = false
-
-      guard clampedWaitDuration > 0 else {
-        hasFinishedWaiting = true
-        return
-      }
-
-      try? await Task.sleep(for: .seconds(clampedWaitDuration))
-
-      guard !Task.isCancelled else { return }
-      withAnimation(.easeInOut(duration: 0.2)) {
-        hasFinishedWaiting = true
-      }
-    }
-  }
-
-  private var clampedWaitDuration: TimeInterval {
-    guard waitDuration.isFinite else { return 0 }
-    return max(0, waitDuration)
-  }
-
-  private var fallbackMessage: some View {
-    Text("Lilypad is still waiting for a `viewportRect` value in the Environment.")
-      .font(.callout)
-      .foregroundStyle(.secondary)
   }
 }

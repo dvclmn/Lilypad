@@ -23,25 +23,28 @@ struct TrackpadGuideView: View {
   let zoomLevel: Double
   let zoomRange: ClosedRange<Double>
 
+  /// Note: previously had these respond to zoom, but the trackpad guide
+  /// doesn't scale with zoom, so this is not neccesary.
   private let rounding: Double = 4
   private let lineWidth: Double = 1
 
   var body: some View {
     if let mappedSize {
       //      .overlay {
-      RoundedRectangle(
-        cornerRadius: rounding.removingZoom(
-          zoomLevel,
-          across: zoomRange,
-        )
+      RoundedRectangle(cornerRadius: rounding
+//        cornerRadius: rounding.removingZoom(
+//          zoomLevel,
+//          across: zoomRange,
+//        )
       )
       .fill(.clear)
       .stroke(
         Color.mint.opacity(0.15),
-        lineWidth: lineWidth.removingZoom(
-          zoomLevel,
-          across: zoomRange,
-        ),
+        lineWidth: lineWidth
+//        lineWidth: lineWidth.removingZoom(
+//          zoomLevel,
+//          across: zoomRange,
+//        ),
       )
       .frame(
         width: mappedSize.rect.size.width,
