@@ -10,10 +10,7 @@ let package = Package(
   products: [
     .library(
       name: "Lilypad",
-      targets: [
-        "Lilypad",
-        "PaintKit",
-      ],
+      targets: ["Lilypad"],
     )
   ],
   dependencies: [
@@ -28,11 +25,6 @@ let package = Package(
         .product(name: "BasePrimitives", package: "BasePrimitives"),
         .product(name: "CoreUtilities", package: "BasePrimitives"),
       ],
-    ),
-//    .target(
-//      name: "PaintKit",
-//      dependencies: ["Lilypad"],
-//    ),
-
+    )
   ],
 )

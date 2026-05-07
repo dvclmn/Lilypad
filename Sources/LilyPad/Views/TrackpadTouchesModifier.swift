@@ -32,7 +32,7 @@ struct TrackpadTouchesModifier: ViewModifier {
 
         if let viewportRect {
           /// NSView that detects touches
-          if effectiveTrackpadMode.isEnabled {
+          if trackpadMode.isEnabled {
             TrackpadTouchesView { handleTouches($0, viewportRect: viewportRect) }
           }
 
@@ -54,13 +54,13 @@ struct TrackpadTouchesModifier: ViewModifier {
       }  // END overlay
 
       /// Modifier to handle pointer hiding etc for Trackpad mode
-      .modifier(TrackpadModeModifier(mode: effectiveTrackpadMode))
+      .modifier(TrackpadModeModifier(mode: trackpadMode))
   }
 }
 
 extension TrackpadTouchesModifier {
   private var showsIndicators: Bool {
-    showsTouchIndicators && mapping != .normalised && effectiveTrackpadMode.isEnabled
+    showsTouchIndicators && mapping != .normalised && trackpadMode.isEnabled
   }
 
   private var context: TrackpadMappingContext {
@@ -82,8 +82,8 @@ extension TrackpadTouchesModifier {
       self.touchesForIndicators = mapped
     }
   }
-  private var effectiveTrackpadMode: TrackpadMode {
-    isPreview ? .active(hidesPointer: false) : trackpadMode
-  }
+//  private var effectiveTrackpadMode: TrackpadMode {
+//    isPreview ? .active(hidesPointer: false) : trackpadMode
+//  }
 
 }

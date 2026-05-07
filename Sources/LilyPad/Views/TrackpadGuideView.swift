@@ -48,9 +48,9 @@ struct TrackpadGuideView: View {
         height: mappedSize.rect.size.height,
       )
       .allowsHitTesting(false)
-//      .overlay {
-//        Text("Zoom: \(zoomLevel)")
-//      }
+      //      .overlay {
+      //        Text("Zoom: \(zoomLevel)")
+      //      }
       //      }
     }
   }
