@@ -43,11 +43,7 @@ struct TrackpadTouchesModifier: ViewModifier {
             TouchIndicatorsView(touches: touchesForIndicators)
           }
 
-          TrackpadGuideView(
-            context: context,
-            zoomLevel: zoomLevel,
-            zoomRange: zoomRange,
-          )
+          TrackpadGuideView(context: context)
         }
 
       }  // END overlay

@@ -18,7 +18,7 @@ extension TrackpadGuideVisibility {
       case .always: return "Always"
       case .drawingMode:
         let label = modeLabel ?? "Trackpad"
-        return "\(label) Mode"
+        return "\(label) Mode Only"
       case .never: return "Never"
     }
   }

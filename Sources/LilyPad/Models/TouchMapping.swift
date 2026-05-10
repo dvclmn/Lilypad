@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum TouchMapping: Equatable, Codable, Sendable {
+public enum TouchMapping: String, Equatable, Codable, Sendable, CaseIterable, Identifiable {
   /// Default — guarantees all touches fit within View
   case fit
 
@@ -15,6 +15,12 @@ public enum TouchMapping: Equatable, Codable, Sendable {
 
   /// Raw 0-1, no scaling
   case normalised
+  
+  public var id: String { rawValue }
+}
+
+extension TouchMapping: CustomStringConvertible {
+  public var description: String { rawValue.capitalized }
 }
 
 /// Note: magnitude is recomputed from the transformed velocity

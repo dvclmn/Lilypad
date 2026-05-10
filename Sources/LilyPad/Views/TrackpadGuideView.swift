@@ -5,7 +5,6 @@
 //  Created by Dave Coleman on 6/4/2026.
 //
 
-//@_spi(Internals) import BasePrimitives
 import CoreUtilities
 import SwiftUI
 
@@ -16,12 +15,7 @@ import SwiftUI
 /// fitted within the canvas size, so users can see the active touch region.
 struct TrackpadGuideView: View {
   @Environment(\.viewportRect) private var viewportRect
-  //  @Environment(\.zoomLevel) private var zoomLevel
-  //  @Environment(\.zoomRange) private var zoomRange
-
   let context: TrackpadMappingContext
-  let zoomLevel: Double
-  let zoomRange: ClosedRange<Double>
 
   /// Note: previously had these respond to zoom, but the trackpad guide
   /// doesn't scale with zoom, so this is not neccesary.
@@ -30,31 +24,18 @@ struct TrackpadGuideView: View {
 
   var body: some View {
     if let mappedSize {
-      //      .overlay {
-      RoundedRectangle(cornerRadius: rounding
-//        cornerRadius: rounding.removingZoom(
-//          zoomLevel,
-//          across: zoomRange,
-//        )
-      )
-      .fill(.clear)
-      .stroke(
-        Color.mint.opacity(0.15),
-        lineWidth: lineWidth
-//        lineWidth: lineWidth.removingZoom(
-//          zoomLevel,
-//          across: zoomRange,
-//        ),
-      )
-      .frame(
-        width: mappedSize.rect.size.width,
-        height: mappedSize.rect.size.height,
-      )
-      .allowsHitTesting(false)
-      //      .overlay {
-      //        Text("Zoom: \(zoomLevel)")
-      //      }
-      //      }
+      RoundedRectangle(cornerRadius: rounding)
+        .fill(.clear)
+        .stroke(
+          Color.mint.opacity(0.15),
+          lineWidth: lineWidth,
+        )
+        .frame(
+          width: mappedSize.rect.size.width,
+          height: mappedSize.rect.size.height,
+        )
+        .allowsHitTesting(false)
+
     }
   }
 }
