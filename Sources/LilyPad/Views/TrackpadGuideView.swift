@@ -5,7 +5,6 @@
 //  Created by Dave Coleman on 6/4/2026.
 //
 
-import CoreUtilities
 import SwiftUI
 
 /// Renders a rectangle showing exactly where trackpad touches
@@ -14,8 +13,10 @@ import SwiftUI
 /// The rectangle preserves the trackpad's physical aspect ratio (~16:10),
 /// fitted within the canvas size, so users can see the active touch region.
 struct TrackpadGuideView: View {
-  @Environment(\.viewportRect) private var viewportRect
+//  @Environment(\.viewportRect) private var viewportRect
+  
   let context: TrackpadMappingContext
+  let viewportRect: CGRect
 
   /// Note: previously had these respond to zoom, but the trackpad guide
   /// doesn't scale with zoom, so this is not neccesary.
@@ -44,7 +45,7 @@ extension TrackpadGuideView {
 
   private var mappedSize: TrackpadMappedRect? {
     guard context.guide.shouldShowGuide(for: context.mode),
-      let viewportRect,
+//      let viewportRect,
       let mappedSize = context.mappedSize(in: viewportRect)
     else { return nil }
     return mappedSize

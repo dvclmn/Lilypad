@@ -31,3 +31,15 @@ extension Array where Element == CGPoint {
     return result
   }
 }
+
+@inlinable func - (lhs: CGPoint, rhs: CGPoint) -> CGPoint {
+  CGPoint(
+    x: lhs.x - rhs.x,
+    y: lhs.y - rhs.y,
+  )
+}
+
+@inlinable public func / (lhs: CGPoint, rhs: CGFloat) -> CGPoint {
+  precondition(!rhs.isZero, "Cannot divide by zero")
+  return CGPoint(x: lhs.x / rhs, y: lhs.y / rhs)
+}

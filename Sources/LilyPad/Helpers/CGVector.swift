@@ -5,8 +5,8 @@
 //  Created by Dave Coleman on 28/3/2026.
 //
 
+//import BasePrimitives
 import Foundation
-import BasePrimitives
 
 extension CGVector {
 
@@ -27,21 +27,26 @@ extension CGVector {
     prevPosition: CGPoint,
     currentPosition: CGPoint,
     factor: CGFloat = 0.3,
-    dt deltaTime: CGFloat
+    dt deltaTime: CGFloat,
   ) -> CGVector {
-    let raw = velocity(from: prevPosition, to: currentPosition, dt: deltaTime)
-    return smoothed.adjustBoth(with: raw) { _, prev, next in
-      (prev * (1 - factor)) + (next * factor)
-    }
+
+    let lhs = smoothed
+    let rhs = velocity(from: prevPosition, to: currentPosition, dt: deltaTime)
+
+    return CGVector(
+      dx: (lhs.dx * (1 - factor)) + (rhs.dx * factor),
+      dy: (lhs.dy * (1 - factor)) + (rhs.dy * factor),
+    )
   }
 
   /// Raw velocity calculated from a position delta over time.
   static func velocity(
     from previous: CGPoint,
     to current: CGPoint,
-    dt deltaTime: CGFloat
+    dt deltaTime: CGFloat,
   ) -> CGVector {
     let delta = (current - previous) / deltaTime
     return CGVector(dx: delta.x, dy: delta.y)
   }
 }
+

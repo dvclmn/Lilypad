@@ -16,4 +16,7 @@ extension CGSize {
     let width: CGFloat = 700
     return CGSize(width: width, height: width * trackpadAspectRatio)
   }
+
+  /// Returns true if both width and height are greater than zero
+  public var isGreaterThanZero: Bool { width > 0 && height > 0 }
 }

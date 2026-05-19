@@ -5,8 +5,6 @@
 //  Created by Dave Coleman on 7/5/2025.
 //
 
-@_spi(Internals) import BasePrimitives
-import CoreUtilities
 import SwiftUI
 
 /// View modifier that overlays trackpad touch capture on any view.
@@ -17,6 +15,7 @@ struct TrackpadTouchesModifier: ViewModifier {
   @State private var touchesForIndicators: [TouchPoint] = []
 
   let canvasSize: CGSize
+  let viewportRect: CGRect?
   let zoomLevel: Double
   let zoomRange: ClosedRange<Double>
   let mapping: TouchMapping
@@ -30,7 +29,10 @@ struct TrackpadTouchesModifier: ViewModifier {
     content
       .overlay {
 
-        RectLoadingView(waitDuration: viewportRectWaitDuration) { viewportRect in
+        RectLoadingView(
+          viewportRect: viewportRect,
+          waitDuration: viewportRectWaitDuration
+        ) { viewportRect in
           /// NSView that detects touches
           if trackpadMode.isEnabled {
             TrackpadTouchesView {
@@ -43,7 +45,7 @@ struct TrackpadTouchesModifier: ViewModifier {
             TouchIndicatorsView(touches: touchesForIndicators)
           }
 
-          TrackpadGuideView(context: context)
+          TrackpadGuideView(context: context, viewportRect: viewportRect)
         }
 
       }  // END overlay

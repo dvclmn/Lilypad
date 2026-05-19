@@ -7,7 +7,7 @@
 
 import AppKit
 import InputPrimitives
-import BasePrimitives
+//import BasePrimitives
 
 /// Processes raw `NSTouch` events into ordered `TouchPoint` values with
 /// smoothed velocity and stable finger numbering.

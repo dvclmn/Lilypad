@@ -44,6 +44,7 @@ extension View {
   ///     are in canvas coordinate space as specified by `canvasSize` and `mapping`.
   public func trackpadTouches(
     canvasSize: CGSize,
+    viewportRect: CGRect?,
     zoomLevel: Double,
     zoomRange: ClosedRange<Double>,
     mapping: TouchMapping = .fit,
@@ -56,6 +57,7 @@ extension View {
     self.modifier(
       TrackpadTouchesModifier(
         canvasSize: canvasSize,
+        viewportRect: viewportRect,
         zoomLevel: zoomLevel,
         zoomRange: zoomRange,
         mapping: mapping,

@@ -5,22 +5,26 @@
 //  Created by Dave Coleman on 7/5/2026.
 //
 
-import BasePrimitives
+//import BasePrimitives
 import SwiftUI
 
 struct RectLoadingView<ResolvedContent: View>: View {
-  @Environment(\.viewportRect) private var viewportRect
+//  @Environment(\.viewportRect) private var viewportRect
   @State private var hasFinishedWaiting: Bool = false
 
+  let viewportRect: CGRect?
   let waitDuration: TimeInterval
   let resolvedContent: (CGRect) -> ResolvedContent
 
-  let animation: Animation = Styles.animationExtraQuickNSmooth
+  let animation: Animation = .smooth(duration: 0.1, extraBounce: 0.2)
+//  let animation: Animation = Styles.animationExtraQuickNSmooth
 
   init(
+    viewportRect: CGRect?,
     waitDuration: TimeInterval,
     @ViewBuilder resolvedContent: @escaping (CGRect) -> ResolvedContent,
   ) {
+    self.viewportRect = viewportRect
     self.waitDuration = waitDuration
     self.resolvedContent = resolvedContent
   }
