@@ -6,8 +6,6 @@
 //
 
 import AppKit
-import InputPrimitives
-//import BasePrimitives
 
 /// Processes raw `NSTouch` events into ordered `TouchPoint` values with
 /// smoothed velocity and stable finger numbering.
@@ -109,7 +107,8 @@ class TrackpadTouchManager {
           magnitude: magnitude,
           pressure: currentPressure,
           stage: currentStage,
-          phase: InteractionPhase(from: touch.phase),
+          phase: touch.phase,
+//          phase: InteractionPhase(from: touch.phase),
           isResting: touch.isResting,
         )
       )

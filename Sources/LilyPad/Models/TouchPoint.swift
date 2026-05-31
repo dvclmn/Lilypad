@@ -6,9 +6,7 @@
 //
 
 import CoreGraphics
-import Foundation
-import InputPrimitives
-//import BasePrimitives
+import AppKit
 
 /// A single trackpad touch with position, velocity, and stable ordering.
 ///
@@ -18,7 +16,7 @@ import InputPrimitives
 ///
 /// Positions are provided in the coordinate space requested when configuring
 /// the touch modifier (normalized 0–1, or mapped to a view size).
-public struct TouchPoint: Identifiable, Hashable, Sendable {
+public struct TouchPoint: Identifiable, Sendable {
 
   /// Stable identity derived from `NSTouch.identity`, consistent across
   /// the full lifecycle of a single finger contact (began → moved → ended).
@@ -50,7 +48,8 @@ public struct TouchPoint: Identifiable, Hashable, Sendable {
   public let stage: Int
 
   /// Current phase of this touch in its lifecycle.
-  public let phase: InteractionPhase
+  public let phase: NSTouch.Phase
+//  public let phase: InteractionPhase
 
   /// Whether this finger is stationary on the trackpad (resting, not moving).
   /// Seems like an overlap with `phase`, but choosing to keep
@@ -65,7 +64,7 @@ public struct TouchPoint: Identifiable, Hashable, Sendable {
     magnitude: CGFloat,
     pressure: CGFloat = 0,
     stage: Int = 0,
-    phase: InteractionPhase,
+    phase: NSTouch.Phase,
     isResting: Bool = false,
   ) {
     self.id = id

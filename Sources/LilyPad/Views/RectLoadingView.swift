@@ -5,11 +5,9 @@
 //  Created by Dave Coleman on 7/5/2026.
 //
 
-//import BasePrimitives
 import SwiftUI
 
 struct RectLoadingView<ResolvedContent: View>: View {
-//  @Environment(\.viewportRect) private var viewportRect
   @State private var hasFinishedWaiting: Bool = false
 
   let viewportRect: CGRect?
