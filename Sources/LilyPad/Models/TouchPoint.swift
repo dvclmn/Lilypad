@@ -49,7 +49,6 @@ public struct TouchPoint: Identifiable, Sendable {
 
   /// Current phase of this touch in its lifecycle.
   public let phase: NSTouch.Phase
-//  public let phase: InteractionPhase
 
   /// Whether this finger is stationary on the trackpad (resting, not moving).
   /// Seems like an overlap with `phase`, but choosing to keep

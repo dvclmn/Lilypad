@@ -108,7 +108,6 @@ class TrackpadTouchManager {
           pressure: currentPressure,
           stage: currentStage,
           phase: touch.phase,
-//          phase: InteractionPhase(from: touch.phase),
           isResting: touch.isResting,
         )
       )
