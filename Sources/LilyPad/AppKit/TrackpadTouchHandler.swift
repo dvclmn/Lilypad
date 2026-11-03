@@ -7,131 +7,135 @@
 
 import AppKit
 
-/// Processes raw `NSTouch` events into ordered `TouchPoint` values with
-/// smoothed velocity and stable finger numbering.
-///
-/// Maintains per-touch history so that velocity can be smoothed across frames,
-/// and so that each finger receives a consistent `touchOrder` based on when
-/// it first made contact.
-///
-/// ## Coordinate Spaces
-///
-/// - ``CoordinateSpace/normalized``: Raw 0–1 values from `NSTouch`.
-///   Origin is bottom-left of the trackpad.
-/// - ``CoordinateSpace/view(_:)``: Normalised values scaled to a view size,
-///   with Y flipped so origin is top-left (matching SwiftUI convention).
-///
-class TrackpadTouchHandler {
+/// A snapshot keeps AppKit event extraction separate from contact bookkeeping.
+/// It also allows lifecycle and velocity regressions to use ordinary values.
+struct TrackpadTouchSample {
+  let identity: any NSObjectProtocol
+  let position: CGPoint
+  let phase: NSTouch.Phase
+  var isResting: Bool = false
+}
 
-  /// Controls how aggressively velocity is smoothed. Lower values produce
-  /// smoother (more laggy) output; higher values track raw input more closely.
-  /// Range: 0 (frozen) to 1 (no smoothing). Default `0.3`.
+/// Processes trackpad events with stable identities, contact order and EMA velocity.
+/// State belongs to this capture session, so the handler has reference semantics.
+final class TrackpadTouchHandler {
   var smoothingFactor: CGFloat = 0.3
 
-  /// Per-touch bookkeeping, keyed by touch identity hash.
-  private var history: [TouchID: TouchState] = [:]
-
-  /// Ambient Force Touch pressure (0–1) from the most recent event.
-  private(set) var currentPressure: CGFloat = 0
-
-  /// Ambient Force Touch stage (0, 1, or 2) from the most recent event.
-  private(set) var currentStage: Int = 0
-
-  /// Updates the ambient pressure and stage from a `pressureChange` event.
-  func updatePressure(_ pressure: CGFloat, stage: Int) {
-    currentPressure = pressure
-    currentStage = stage
+  private struct Contact {
+    let identity: any NSObjectProtocol
+    let id: TouchID
+    let order: Int
+    var state: TouchState?
   }
 
-  /// Processes a set of raw `NSTouch` values from a single event into an
-  /// ordered array of ``TouchPoint`` values.
-  ///
-  /// The returned array is sorted by the order each finger first made contact
-  /// (earliest first), providing stable finger numbering across frames.
+  // Equality, rather than hash values, distinguishes AppKit identities. The small
+  // number of simultaneous fingers makes a linear lookup sufficient.
+  private var contacts: [Contact] = []
+  private var nextID = 0
+  private var nextOrder = 0
+
+  private(set) var currentPressure: CGFloat = 0
+  private(set) var currentStage: Int = 0
+
+  func updatePressure(_ pressure: CGFloat, stage: Int) {
+    currentPressure = pressure.isFinite ? min(max(pressure, 0), 1) : 0
+    currentStage = min(max(stage, 0), 2)
+  }
+
   func processTouches(
     _ nsTouches: Set<NSTouch>,
     timestamp: TimeInterval,
   ) -> [TouchPoint] {
+    processSamples(nsTouches.map {
+      TrackpadTouchSample(
+        identity: $0.identity,
+        position: $0.normalizedPosition,
+        phase: $0.phase,
+        isResting: $0.isResting
+      )
+    }, timestamp: timestamp)
+  }
 
+  /// Simultaneous arrivals are ordered left-to-right, then bottom-to-top.
+  /// Coincident arrivals have no physical ordering; their issued order is retained.
+  /// Missing contacts are retained: an empty/partial event is not a terminal event.
+  func processSamples(
+    _ samples: [TrackpadTouchSample],
+    timestamp: TimeInterval,
+  ) -> [TouchPoint] {
     var results: [TouchPoint] = []
-    results.reserveCapacity(nsTouches.count)
+    var finished: Set<TouchID> = []
+    let ordered = samples.sorted {
+      let lhsX = $0.position.x.isFinite ? $0.position.x : 0
+      let rhsX = $1.position.x.isFinite ? $1.position.x : 0
+      if lhsX != rhsX { return lhsX < rhsX }
+      let lhsY = $0.position.y.isFinite ? $0.position.y : 0
+      let rhsY = $1.position.y.isFinite ? $1.position.y : 0
+      return lhsY < rhsY
+    }
 
-    for touch in nsTouches {
-      let id = TouchID(rawValue: touch.identity.hash)
-      let position = touch.normalizedPosition
+    for sample in ordered {
+      let index: Int
+      if let existing = contacts.firstIndex(where: { $0.identity.isEqual(sample.identity) }) {
+        index = existing
+      } else {
+        index = contacts.count
+        contacts.append(Contact(
+          identity: sample.identity,
+          id: TouchID(rawValue: nextID),
+          order: nextOrder
+        ))
+        nextID += 1
+        nextOrder += 1
+      }
 
-      /// Calculate smoothed velocity from history
-      var velocity = CGVector.zero
-      if let previous = history[id] {
-        let dt = CGFloat(timestamp - previous.lastTimestamp)
-        if dt > 0 {
-          velocity = CGVector.smoothed(
-            previous: previous.smoothedVelocity,
-            prevPosition: previous.lastPosition,
-            currentPosition: position,
-            factor: smoothingFactor,
-            dt: dt,
-          )
+      var contact = contacts[index]
+      let isTerminal = sample.phase == .ended || sample.phase == .cancelled
+      if isTerminal { finished.insert(contact.id) }
+
+      // Invalid samples must not poison the next velocity calculation. A terminal
+      // sample still releases the contact, using its last valid position if needed.
+      let isFinitePosition = sample.position.x.isFinite && sample.position.y.isFinite
+      let position = isFinitePosition ? sample.position : (contact.state?.lastPosition ?? .zero)
+      var velocity = contact.state?.smoothedVelocity ?? .zero
+      if timestamp.isFinite && isFinitePosition {
+        if let previous = contact.state {
+          let dt = CGFloat(timestamp - previous.lastTimestamp)
+          if dt.isFinite && dt > 0 {
+            velocity = .smoothed(
+              previous: previous.smoothedVelocity,
+              prevPosition: previous.lastPosition,
+              currentPosition: position,
+              factor: smoothingFactor,
+              dt: dt
+            )
+            contact.state = TouchState(lastPosition: position, lastTimestamp: timestamp, smoothedVelocity: velocity)
+          }
+          // Repeated/backwards timestamps leave the valid baseline untouched.
+        } else {
+          contact.state = TouchState(lastPosition: position, lastTimestamp: timestamp)
         }
       }
-
-      /// Determine the first-seen time for ordering
-      let firstSeen: TimeInterval
-      if let existing = history[id] {
-        firstSeen = existing.firstSeen
-      } else {
-        firstSeen = timestamp
-      }
-
-      /// Update or clean up history
-      if touch.phase == .ended || touch.phase == .cancelled {
-        history.removeValue(forKey: id)
-
-      } else {
-        history[id] = TouchState(
-          lastPosition: position,
-          lastTimestamp: timestamp,
-          smoothedVelocity: velocity,
-          firstSeen: firstSeen,
-        )
-      }
-
-      let magnitude = sqrt(velocity.dx * velocity.dx + velocity.dy * velocity.dy)
-
-      results.append(
-        TouchPoint(
-          id: id,
-          touchOrder: 0,  // placeholder — assigned after sorting
-          position: position,
-          velocity: velocity,
-          magnitude: magnitude,
-          pressure: currentPressure,
-          stage: currentStage,
-          phase: touch.phase,
-          isResting: touch.isResting,
-        )
-      )
+      contacts[index] = contact
+      results.append(TouchPoint(
+        id: contact.id,
+        touchOrder: contact.order,
+        position: position,
+        velocity: velocity,
+        magnitude: hypot(velocity.dx, velocity.dy),
+        pressure: currentPressure,
+        stage: currentStage,
+        phase: sample.phase,
+        isResting: sample.isResting
+      ))
     }
 
-    /// Sort by first-seen time (earliest first), then assign stable order indices
-    results.sort { lhs, rhs in
-      let lhsTime = history[lhs.id]?.firstSeen ?? timestamp
-      let rhsTime = history[rhs.id]?.firstSeen ?? timestamp
-      return lhsTime < rhsTime
+    contacts.removeAll { finished.contains($0.id) }
+    if contacts.isEmpty {
+      nextOrder = 0
+      currentPressure = 0
+      currentStage = 0
     }
-
-    return results.enumerated().map { index, point in
-      TouchPoint(
-        id: point.id,
-        touchOrder: index,
-        position: point.position,
-        velocity: point.velocity,
-        magnitude: point.magnitude,
-        pressure: point.pressure,
-        stage: point.stage,
-        phase: point.phase,
-        isResting: point.isResting,
-      )
-    }
+    return results.sorted { $0.touchOrder < $1.touchOrder }
   }
 }

@@ -18,6 +18,7 @@ let package = Package(
   ],
 
   targets: [
-    .target(name: "Lilypad")
+    .target(name: "Lilypad"),
+    .testTarget(name: "LilypadTests", dependencies: ["Lilypad"])
   ],
 )

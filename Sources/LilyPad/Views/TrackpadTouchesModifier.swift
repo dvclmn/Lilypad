@@ -68,7 +68,7 @@ extension TrackpadTouchesModifier {
     _ touches: [TouchPoint],
     viewportRect: CGRect,
   ) {
-    guard let mappedSize = context.mappedSize(in: viewportRect) else { return }
+    guard let mappedSize = context.mappedSize(in: viewportRect.size) else { return }
     let mapped = mapping.mapTouches(
       touches,
       in: mappedSize,

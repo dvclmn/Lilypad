@@ -14,14 +14,16 @@ struct TrackpadMappingContext {
 }
 
 extension TrackpadMappingContext {
+  /// Mapping uses local viewport coordinates, independent of the viewport's
+  /// origin in a parent, window or screen coordinate space.
   func mappedSize(
-    in viewportRect: CGRect,
+    in viewportSize: CGSize,
     aspectRatio: CGFloat = CGSize.trackpadAspectRatio,
   ) -> TrackpadMappedRect? {
     .makeRect(
-      in: viewportRect.size,
+      in: viewportSize,
       mapping: mapping,
-      sourceAspectRatio: CGSize.trackpadAspectRatio,
+      sourceAspectRatio: aspectRatio,
     )
   }
 }

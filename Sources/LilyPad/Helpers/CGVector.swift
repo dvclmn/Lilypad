@@ -29,7 +29,8 @@ extension CGVector {
     dt deltaTime: CGFloat,
   ) -> CGVector {
 
-    let lhs = smoothed
+    let lhs = smoothed.dx.isFinite && smoothed.dy.isFinite ? smoothed : .zero
+    let factor = factor.isFinite ? min(max(factor, 0), 1) : 0.3
     let rhs = velocity(from: prevPosition, to: currentPosition, dt: deltaTime)
 
     return CGVector(
@@ -44,8 +45,11 @@ extension CGVector {
     to current: CGPoint,
     dt deltaTime: CGFloat,
   ) -> CGVector {
-    let delta = (current - previous) / deltaTime
-    return CGVector(dx: delta.x, dy: delta.y)
+    guard deltaTime.isFinite, deltaTime > 0 else { return .zero }
+    let dx = (current.x - previous.x) / deltaTime
+    let dy = (current.y - previous.y) / deltaTime
+    guard dx.isFinite, dy.isFinite else { return .zero }
+    return CGVector(dx: dx, dy: dy)
   }
 }
 

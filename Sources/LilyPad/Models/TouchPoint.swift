@@ -15,10 +15,10 @@ import AppKit
 /// fingers were placed down — finger 1 stays finger 1 for the duration of contact.
 ///
 /// Positions are provided in the coordinate space requested when configuring
-/// the touch modifier (normalized 0–1, or mapped to a view size).
+/// the touch modifier (normalised 0–1, or mapped to a view size).
 public struct TouchPoint: Identifiable, Sendable {
 
-  /// Stable identity derived from `NSTouch.identity`, consistent across
+  /// Opaque identity issued by the capture handler, consistent across
   /// the full lifecycle of a single finger contact (began → moved → ended).
   public let id: TouchID
 
@@ -26,6 +26,8 @@ public struct TouchPoint: Identifiable, Sendable {
   /// down. Finger ordering is determined by arrival time — the first finger
   /// to touch gets order 0, the second gets order 1, etc. This remains
   /// constant for the lifetime of the touch, even if earlier fingers lift off.
+  /// Numbering restarts at zero after all contacts end. Simultaneous arrivals
+  /// are ordered spatially; order is not an index into the current update array.
   public let touchOrder: Int
 
   /// Position in the configured coordinate space.

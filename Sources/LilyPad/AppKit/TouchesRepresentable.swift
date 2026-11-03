@@ -23,14 +23,7 @@ struct TrackpadTouchesView: NSViewRepresentable {
   }
 
   func updateNSView(_ nsView: TrackpadTouchesNSView, context: Context) {
-//    nsView.onTouchesChanged = didUpdateTouches
-//    if isActive {
-      /// Reclaim first responder whenever mode activates, ensuring
-      /// touches route here even after a toolbar click stole focus.
-//      DispatchQueue.main.async {
-//        nsView.claimFocus()
-//      }
-//    }
+    nsView.onTouchesChanged = didUpdateTouches
   }
 }
 #endif

@@ -46,7 +46,7 @@ extension TrackpadGuideView {
   private var mappedSize: TrackpadMappedRect? {
     guard context.guide.shouldShowGuide(for: context.mode),
 //      let viewportRect,
-      let mappedSize = context.mappedSize(in: viewportRect)
+      let mappedSize = context.mappedSize(in: viewportRect.size)
     else { return nil }
     return mappedSize
   }

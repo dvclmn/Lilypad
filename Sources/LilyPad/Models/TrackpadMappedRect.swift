@@ -16,11 +16,14 @@ import Foundation
 /// exactly where trackpad touches will land.
 public struct TrackpadMappedRect: Equatable, Sendable {
 
-  /// Rect in screen space
+  /// Rectangle in local viewport coordinates.
   public let rect: CGRect
   let scale: CGFloat
   let aspectRatio: CGFloat
 
+  /// Creates an explicit mapping. The caller must supply finite geometry, a
+  /// positive scale and aspect ratio, and a rect size matching that transform.
+  /// Prefer `makeRect(in:mapping:sourceAspectRatio:)` for validated layout input.
   public init(
     rect: CGRect,
     scale: CGFloat,
@@ -36,14 +39,20 @@ extension TrackpadMappedRect {
 
   /// Computes the rectangle within the view that the trackpad maps onto.
   /// `viewSize` is expected to be in screen (viewport) space,
-  /// not local canvas/artwork/document space.
+  /// not local canvas/artwork/document space. The result has a local viewport
+  /// origin; no parent/window origin is applied. Invalid or unrepresentable
+  /// geometry returns `nil`. For `.normalised`, the rect describes the viewport
+  /// guide only; touch positions and velocities remain untouched.
   public static func makeRect(
     in viewSize: CGSize,
     mapping: TouchMapping,
     sourceAspectRatio: CGFloat = CGSize.trackpadAspectRatio,
   ) -> TrackpadMappedRect? {
 
-    guard viewSize.isGreaterThanZero else { return nil }
+    guard viewSize.width.isFinite, viewSize.height.isFinite,
+      viewSize.width > 0, viewSize.height > 0,
+      sourceAspectRatio.isFinite, sourceAspectRatio > 0
+    else { return nil }
 
     switch mapping {
       case .normalised:
@@ -66,6 +75,10 @@ extension TrackpadMappedRect {
 
         let scaledWidth = sourceWidth * scale
         let scaledHeight = sourceHeight * scale
+        guard scale.isFinite, scale > 0,
+          scaledWidth.isFinite, scaledHeight.isFinite,
+          scaledWidth > 0, scaledHeight > 0
+        else { return nil }
         let offsetX = (viewSize.width - scaledWidth) / 2
         let offsetY = (viewSize.height - scaledHeight) / 2
 
