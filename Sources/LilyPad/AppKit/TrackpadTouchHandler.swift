@@ -1,5 +1,5 @@
 //
-//  TrackpadTouchManager.swift
+//  TrackpadTouchHandler.swift
 //  Lilypad
 //
 //  Created by Dave Coleman on 3/5/2025.
@@ -21,7 +21,7 @@ import AppKit
 /// - ``CoordinateSpace/view(_:)``: Normalised values scaled to a view size,
 ///   with Y flipped so origin is top-left (matching SwiftUI convention).
 ///
-class TrackpadTouchManager {
+class TrackpadTouchHandler {
 
   /// Controls how aggressively velocity is smoothed. Lower values produce
   /// smoother (more laggy) output; higher values track raw input more closely.
