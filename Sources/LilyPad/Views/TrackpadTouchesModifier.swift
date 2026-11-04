@@ -12,7 +12,7 @@ import SwiftUI
 /// Enable `showIndicators` for a visual debug overlay showing
 /// numbered finger positions on the trackpad.
 struct TrackpadTouchesModifier: ViewModifier {
-  @State private var touchesForIndicators: [TouchPoint] = []
+  @State private var touchesForIndicators: [TouchID: TouchPoint] = [:]
 
   let canvasSize: CGSize
   let viewportRect: CGRect?
@@ -31,18 +31,26 @@ struct TrackpadTouchesModifier: ViewModifier {
 
         RectLoadingView(
           viewportRect: viewportRect,
-          waitDuration: viewportRectWaitDuration
+          waitDuration: viewportRectWaitDuration,
         ) { viewportRect in
           /// NSView that detects touches
           if trackpadMode.isEnabled {
             TrackpadTouchesView {
               handleTouches($0, viewportRect: viewportRect)
             }
+            .onDisappear {
+              // A removed capture view cannot deliver its remaining terminal events.
+              touchesForIndicators.removeAll()
+            }
           }
 
           /// Finger location indicators, if enabled
           if showsIndicators {
-            TouchIndicatorsView(touches: touchesForIndicators)
+            TouchIndicatorsView(
+              touches: touchesForIndicators.values.sorted {
+                $0.touchOrder < $1.touchOrder
+              }
+            )
           }
 
           TrackpadGuideView(context: context, viewportRect: viewportRect)
@@ -73,10 +81,21 @@ extension TrackpadTouchesModifier {
       touches,
       in: mappedSize,
     )
+    // Consumers need every phase, including ended and cancelled contacts.
     action(mapped, mappedSize)
 
-    if showsTouchIndicators {
-      self.touchesForIndicators = mapped
+    // Indicator state spans updates: a partial event must not erase other fingers.
+    for touch in mapped {
+      switch touch.phase {
+        case .ended, .cancelled:
+          touchesForIndicators.removeValue(forKey: touch.id)
+
+        case .began, .moved, .stationary:
+          touchesForIndicators[touch.id] = touch
+
+        default:
+          break
+      }
     }
   }
 }

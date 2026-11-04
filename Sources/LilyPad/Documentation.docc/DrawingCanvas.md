@@ -14,7 +14,7 @@ Catmull-Rom interpolation. Positions *and* speed values are interpolated
 together, so the width follows the actual curve, not just the control points.
 
 2. **Width mapping** — each sampled point's speed is passed through
-``BrushStyle/width(for:)`` to get a line width. Slower = wider.
+``StrokeWidthProfile/width(for:)`` to get a line width. Slower = wider.
 
 3. **Variable-width fill** — a ``VariableWidthPath`` accumulates left/right
 edge offsets and generates a filled outline path.
@@ -39,7 +39,7 @@ To do:
 
 ## Customising
 
-- Swap in a different ``BrushStyle`` to change the speed-to-width mapping.
+- Swap in a different ``StrokeWidthProfile`` to change the speed-to-width mapping.
 - Adjust ``catmullSteps`` to trade smoothness for performance.
 - Replace the fill call with a texture stamp or blend mode for richer effects.
 
