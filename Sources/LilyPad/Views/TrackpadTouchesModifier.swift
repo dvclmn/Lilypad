@@ -9,54 +9,33 @@ import SwiftUI
 
 /// View modifier that overlays trackpad touch capture on any view.
 ///
-/// Enable `showIndicators` for a visual debug overlay showing
-/// numbered finger positions on the trackpad.
+/// Presentation comes from Lilypad's environment values. Geometry is either
+/// supplied by the caller or read directly inside the overlay, without copying
+/// it into state or publishing it through the environment.
 struct TrackpadTouchesModifier: ViewModifier {
   @State private var touchesForIndicators: [TouchID: TouchPoint] = [:]
+  @Environment(\.trackpadGuideVisibility) private var guideVisibility
+  @Environment(\.showsTrackpadTouchIndicators) private var showsTouchIndicators
 
-  let canvasSize: CGSize
-  let viewportRect: CGRect?
-  let zoomLevel: Double
-  let zoomRange: ClosedRange<Double>
+  /// `nil` measures the modified view. A supplied size skips measurement.
+  let viewportSize: CGSize?
   let mapping: TouchMapping
   let trackpadMode: TrackpadMode
-  let guideVisibility: TrackpadGuideVisibility
-  let showsTouchIndicators: Bool
-  let viewportRectWaitDuration: TimeInterval
   let action: ([TouchPoint], TrackpadMappedRect) -> Void
 
   func body(content: Content) -> some View {
     content
       .overlay {
-
-        RectLoadingView(
-          viewportRect: viewportRect,
-          waitDuration: viewportRectWaitDuration,
-        ) { viewportRect in
-          /// NSView that detects touches
-          if trackpadMode.isEnabled {
-            TrackpadTouchesView {
-              handleTouches($0, viewportRect: viewportRect)
-            }
-            .onDisappear {
-              // A removed capture view cannot deliver its remaining terminal events.
-              touchesForIndicators.removeAll()
-            }
+        if let viewportSize {
+          captureOverlay(in: viewportSize)
+        } else {
+          // Keep this reader inside the overlay so it cannot determine the
+          // base view's size. Its size is consumed directly, with no state hop.
+          GeometryReader { geometry in
+            captureOverlay(in: geometry.size)
           }
-
-          /// Finger location indicators, if enabled
-          if showsIndicators {
-            TouchIndicatorsView(
-              touches: touchesForIndicators.values.sorted {
-                $0.touchOrder < $1.touchOrder
-              }
-            )
-          }
-
-          TrackpadGuideView(context: context, viewportRect: viewportRect)
         }
-
-      }  // END overlay
+      }
 
       /// Modifier to handle pointer hiding etc for Trackpad mode
       .modifier(TrackpadModeModifier(mode: trackpadMode))
@@ -64,6 +43,38 @@ struct TrackpadTouchesModifier: ViewModifier {
 }
 
 extension TrackpadTouchesModifier {
+  @ViewBuilder
+  private func captureOverlay(in size: CGSize) -> some View {
+    // Reject transient zero sizes and invalid geometry. Capture starts as soon
+    // as layout supplies valid bounds; no timer or loading state is required.
+    if let mappedRect = context.mappedSize(in: size) {
+      ZStack {
+        if trackpadMode.isEnabled {
+          TrackpadTouchesView {
+            handleTouches($0, mappedRect: mappedRect)
+          }
+          .onDisappear {
+            // A removed capture view cannot deliver its remaining terminal events.
+            touchesForIndicators.removeAll()
+          }
+        }
+
+        if showsIndicators {
+          TouchIndicatorsView(
+            touches: touchesForIndicators.values.sorted {
+              $0.touchOrder < $1.touchOrder
+            }
+          )
+        }
+
+        if guideVisibility.shouldShowGuide(for: trackpadMode) {
+          TrackpadGuideView(mappedRect: mappedRect)
+        }
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+  }
+
   private var showsIndicators: Bool {
     showsTouchIndicators && mapping != .normalised && trackpadMode.isEnabled
   }
@@ -74,15 +85,14 @@ extension TrackpadTouchesModifier {
 
   private func handleTouches(
     _ touches: [TouchPoint],
-    viewportRect: CGRect,
+    mappedRect: TrackpadMappedRect,
   ) {
-    guard let mappedSize = context.mappedSize(in: viewportRect.size) else { return }
     let mapped = mapping.mapTouches(
       touches,
-      in: mappedSize,
+      in: mappedRect,
     )
     // Consumers need every phase, including ended and cancelled contacts.
-    action(mapped, mappedSize)
+    action(mapped, mappedRect)
 
     // Indicator state spans updates: a partial event must not erase other fingers.
     for touch in mapped {

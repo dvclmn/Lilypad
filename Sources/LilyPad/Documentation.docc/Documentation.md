@@ -1,6 +1,29 @@
 # ``Lilypad``
 
-A Swift library to capture touch events from a mac trackpad.
+A Swift library to capture touch events from a Mac trackpad.
 
-The touch data can be used in a variety of creative ways. One example is to create a drawing app using the touchpad — a bit like finger painting.
+Touch data can support drawing, gesture experiments and other interactions without requiring a canvas framework.
 
+```swift
+MyInputSurface()
+  .trackpadTouches(mode: .active(hidesPointer: false)) { touches, mappedRect in
+    for touch in touches {
+      print("Finger \(touch.touchOrder + 1): \(touch.position)")
+    }
+  }
+  .trackpadGuideVisibility(.drawingMode)
+  .trackpadTouchIndicators(true)
+```
+
+Lilypad measures the modified view by default. Pass `viewportSize:` when a parent already owns the same geometry and you want to share it without another measurement.
+
+## Topics
+
+### Capturing input
+
+- <doc:TouchesModifier>
+- ``TouchPoint``
+- ``TouchMapping``
+- ``TrackpadMappedRect``
+- ``TrackpadMode``
+- ``TrackpadGuideVisibility``

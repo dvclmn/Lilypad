@@ -9,39 +9,87 @@ import SwiftUI
 
 extension View {
 
-  /// Captures trackpad multi-touch input and delivers ordered touch updates.
+  /// Captures ordered trackpad touch updates mapped into this view's bounds.
   ///
-  /// This modifier overlays trackpad touch capture on your view, transforming raw
-  /// trackpad coordinates into your canvas coordinate space according to the specified
-  /// mapping strategy. Touch positions are delivered with stable ordering based on
-  /// the sequence fingers made contact.
+  /// Lilypad reads the modified view's size inside an overlay. No canvas size,
+  /// zoom state or ancestor viewport environment is required. The overlay does
+  /// not determine the modified view's layout; apply this to a sized surface.
+  ///
+  /// With `.fit` or `.fill`, positions use local view coordinates with a top-left
+  /// origin. With `.normalised`, positions remain in 0–1 trackpad coordinates
+  /// with a bottom-left origin, and velocity remains in those units per second.
+  /// The returned rectangle always describes the mapping in local view points.
+  ///
+  /// Use `.trackpadGuideVisibility(_:)` and `.trackpadTouchIndicators(_:)` after
+  /// this modifier, or on an ancestor, to configure presentation.
   ///
   /// - Parameters:
-  ///   - canvasSize: The size of your target canvas or drawing area. Touch coordinates
-  ///     will be mapped into this coordinate space.
-  ///   - mapping: How trackpad coordinates map to the canvas. Options:
-  ///     - `.fit` (default): Scales uniformly to fit the trackpad's aspect ratio within
-  ///       the canvas, adding letterboxing if needed. Guarantees all touches stay in bounds.
-  ///     - `.fill`: Scales uniformly to fill the canvas, cropping the trackpad area if needed.
-  ///     - `.normalised`: Raw 0–1 normalized coordinates with no transformation.
-  ///   - mode: Controls trackpad capture behaviour:
-  ///     - `.active`: Captures touches with standard pointer behaviour.
-  ///     - `.activePointerHidden`: Captures touches and hides the pointer to prevent
-  ///       accidental clicks or focus loss.
-  ///     - `.inactive` (default): Disables touch capture entirely.
-  ///   - trackpadMatchesZoom: When `true`, the trackpad mapping adjusts to match
-  ///     canvas zoom level (implementation defined by your view's zoom state).
-  ///   - guideVisibility: Controls when the visual trackpad mapping guide appears:
-  ///     - `.always` (default): Guide always visible.
-  ///     - `.drawingMode`: Guide visible only when `mode` is enabled (`.active` or `.activePointerHidden`).
-  ///     - `.never`: Guide never visible.
-  ///   - showsTouchIndicators: When `true` (default), displays numbered overlays showing
-  ///     each finger's position and touch order.
-  ///   - viewportRectWaitDuration: How long to show a loading state while waiting for
-  ///     a `viewportRect` value to arrive in the environment.
-  ///   - action: Called each time touches change, receiving an array of ``TouchPoint``
-  ///     values sorted by first-contact order (finger 1, finger 2, etc.). Touch positions
-  ///     are in canvas coordinate space as specified by `canvasSize` and `mapping`.
+  ///   - mapping: Fits the trackpad's aspect ratio within the view, fills the view
+  ///     with cropping, or delivers untransformed normalised touches.
+  ///   - mode: Whether capture is enabled and whether the pointer is hidden.
+  ///     Defaults to `.inactive`.
+  ///   - action: Receives each touch update in first-contact order and the mapped
+  ///     rectangle. Updates include ended and cancelled touches, and may contain
+  ///     only a subset of the fingers currently touching the trackpad.
+  public func trackpadTouches(
+    mapping: TouchMapping = .fit,
+    mode: TrackpadMode = .inactive,
+    perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
+  ) -> some View {
+    modifier(
+      TrackpadTouchesModifier(
+        viewportSize: nil,
+        mapping: mapping,
+        trackpadMode: mode,
+        action: action,
+      )
+    )
+  }
+
+  /// Captures trackpad touches using a viewport size already owned by the caller.
+  ///
+  /// This overload performs no geometry measurement. Use it when a parent already
+  /// measures the same capture surface and shares its size with several tools.
+  /// Supply the surface's untransformed local size in points, rather than an
+  /// artwork size, a global frame or another view's safe-area size.
+  ///
+  /// Positions and the mapped rectangle use a local zero origin; `.normalised`
+  /// leaves touch coordinates unchanged. Geometry updates take effect without an
+  /// artificial delay. Zero, negative or non-finite sizes suspend capture and its
+  /// overlays until valid geometry arrives. No fallback size is substituted.
+  ///
+  /// - Parameters:
+  ///   - viewportSize: The current size of the capture surface in local points.
+  ///   - mapping: How trackpad coordinates map into the viewport.
+  ///   - mode: Whether capture is enabled and whether the pointer is hidden.
+  ///   - action: Receives ordered touch updates and the local mapping rectangle.
+  public func trackpadTouches(
+    viewportSize: CGSize,
+    mapping: TouchMapping = .fit,
+    mode: TrackpadMode = .inactive,
+    perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
+  ) -> some View {
+    modifier(
+      TrackpadTouchesModifier(
+        viewportSize: viewportSize,
+        mapping: mapping,
+        trackpadMode: mode,
+        action: action,
+      )
+    )
+  }
+
+  /// Compatibility overload for existing clients.
+  ///
+  /// Only `viewportRect.size` is used for geometry. `canvasSize`, `zoomLevel` and
+  /// `zoomRange` had no effect on mapping and remain unused. The waiting duration
+  /// is now ignored: capture starts as soon as valid geometry is available.
+  /// A `nil` viewport suspends capture until the caller supplies a valid rectangle.
+  /// The explicit presentation arguments take precedence over inherited settings.
+  @available(
+    *, deprecated,
+    message: "Use trackpadTouches(mapping:mode:perform:) or the viewportSize overload, with trackpadGuideVisibility(_:) and trackpadTouchIndicators(_:)."
+  )
   public func trackpadTouches(
     canvasSize: CGSize,
     viewportRect: CGRect?,
@@ -54,19 +102,41 @@ extension View {
     viewportRectWaitDuration: TimeInterval = 1,
     perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
   ) -> some View {
-    self.modifier(
-      TrackpadTouchesModifier(
-        canvasSize: canvasSize,
-        viewportRect: viewportRect,
-        zoomLevel: zoomLevel,
-        zoomRange: zoomRange,
-        mapping: mapping,
-        trackpadMode: mode,
-        guideVisibility: guideVisibility,
-        showsTouchIndicators: showsTouchIndicators,
-        viewportRectWaitDuration: viewportRectWaitDuration,
-        action: action,
-      )
+    trackpadTouches(
+      viewportSize: viewportRect?.size ?? .zero,
+      mapping: mapping,
+      mode: mode,
+      perform: action,
     )
+    .trackpadGuideVisibility(guideVisibility)
+    .trackpadTouchIndicators(showsTouchIndicators)
+  }
+}
+
+// MARK: - Presentation
+
+extension EnvironmentValues {
+  /// When Lilypad displays the trackpad mapping guide.
+  @Entry public var trackpadGuideVisibility: TrackpadGuideVisibility = .always
+
+  /// Whether Lilypad displays numbered touch indicators when capture is active.
+  /// Indicators are hidden for normalised mapping, whose positions are not points.
+  @Entry public var showsTrackpadTouchIndicators: Bool = true
+}
+
+extension View {
+  /// Sets guide visibility for trackpad capture surfaces in this view hierarchy.
+  ///
+  /// Apply after `.trackpadTouches(...)` or to an ancestor of the capture view.
+  public func trackpadGuideVisibility(_ visibility: TrackpadGuideVisibility) -> some View {
+    environment(\.trackpadGuideVisibility, visibility)
+  }
+
+  /// Sets whether trackpad capture surfaces display numbered touch indicators.
+  ///
+  /// Apply after `.trackpadTouches(...)` or to an ancestor of the capture view.
+  /// This setting changes presentation only; touch callbacks are unaffected.
+  public func trackpadTouchIndicators(_ isVisible: Bool) -> some View {
+    environment(\.showsTrackpadTouchIndicators, isVisible)
   }
 }

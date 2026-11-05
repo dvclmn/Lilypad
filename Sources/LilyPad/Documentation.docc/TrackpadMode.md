@@ -1,31 +1,26 @@
-# TrackpadMode
+# Trackpad mode and pointer behaviour
 
-Manages pointer behaviour for absolute-position trackpad drawing.
+Control touch capture and pointer hiding with ``TrackpadMode``.
 
-When drawing mode is active, the system cursor is hidden and locked in
-place so it can't drift to another window or screen. Mouse clicks are
-suppressed to prevent accidental focus changes. When the mode is
-deactivated (or the app loses focus), everything is restored cleanly.
-
-## Why a class and not a ViewModifier?
-
-Pointer state (`NSCursor.hide`, `CGAssociateMouseAndMouseCursorPosition`)
-is process-global. A SwiftUI modifier's lifecycle doesn't map cleanly to
-process-global state — `.task(id:)` can re-fire, views can be recreated,
-etc. This class owns the state explicitly with balanced engage/disengage
-calls, and a companion modifier (``TrackpadModeModifier``) handles the
-SwiftUI lifecycle hookup.
+`.inactive` disables capture. `.active(hidesPointer: false)` enables capture with standard pointer behaviour. `.active(hidesPointer: true)` also engages pointer hiding and locking, with restoration when the mode ends or the application loses focus.
 
 ## Usage
 
 ```swift
-@State private var trackpadMode = TrackpadModeHandler()
+@State private var capturesTouches = false
 
-MyCanvas()
-  .trackpadTouches { touches in engine.processTouches(touches) }
-  .trackpadMode(trackpadMode)
-  .toolbar {
-    Toggle("Draw", isOn: $trackpadMode.isActive)
-  }
+var body: some View {
+  MyInputSurface()
+    .trackpadTouches(
+      mode: capturesTouches ? .active(hidesPointer: true) : .inactive
+    ) { touches, mappedRect in
+      // Process input.
+    }
+    .trackpadGuideVisibility(.drawingMode)
+    .toolbar {
+      Toggle("Capture touches", isOn: $capturesTouches)
+    }
+}
 ```
 
+The internal `TrackpadModeModifier` connects pointer management to the capture view's lifecycle. Clients pass a mode to `.trackpadTouches(...)`; no separate `.trackpadMode(...)` modifier is required.
