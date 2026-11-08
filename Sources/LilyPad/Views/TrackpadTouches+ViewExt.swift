@@ -32,14 +32,14 @@ extension View {
   ///     rectangle. Updates include ended and cancelled touches, and may contain
   ///     only a subset of the fingers currently touching the trackpad.
   public func trackpadTouches(
-    mode: TrackpadMode = .inactive,
+    isEnabled: Bool = true,
     mapping: TouchMapping = .fit,
     perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
   ) -> some View {
     modifier(
       TrackpadTouchesModifier(
+        isEnabled: isEnabled,
         viewportSize: nil,
-        trackpadMode: mode,
         mapping: mapping,
         action: action,
       )
@@ -65,14 +65,15 @@ extension View {
   ///   - action: Receives ordered touch updates and the local mapping rectangle.
   public func trackpadTouches(
     viewportSize: CGSize,
-    mode: TrackpadMode = .inactive,
+    isEnabled: Bool = true,
     mapping: TouchMapping = .fit,
     perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
   ) -> some View {
     modifier(
       TrackpadTouchesModifier(
+        isEnabled: isEnabled,
         viewportSize: viewportSize,
-        trackpadMode: mode,
+//        trackpadMode: mode,
         mapping: mapping,
         action: action,
       )

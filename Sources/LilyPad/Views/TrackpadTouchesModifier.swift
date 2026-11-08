@@ -18,8 +18,9 @@ struct TrackpadTouchesModifier: ViewModifier {
   @Environment(\.showsTrackpadTouchIndicators) private var showsTouchIndicators
 
   /// `nil` measures the modified view. A supplied size skips measurement.
+  let isEnabled: Bool
   let viewportSize: CGSize?
-  let trackpadMode: TrackpadMode
+//  let trackpadMode: TrackpadMode
   let mapping: TouchMapping
   let action: ([TouchPoint], TrackpadMappedRect) -> Void
 
@@ -49,7 +50,7 @@ extension TrackpadTouchesModifier {
     // as layout supplies valid bounds; no timer or loading state is required.
     if let mappedRect = context.mappedSize(in: size) {
       ZStack {
-        if trackpadMode.isEnabled {
+        if isEnabled {
           TrackpadTouchesView {
             handleTouches($0, mappedRect: mappedRect)
           }
@@ -67,7 +68,7 @@ extension TrackpadTouchesModifier {
           )
         }
 
-        if guideVisibility.shouldShowGuide(for: trackpadMode) {
+        if guideVisibility.shouldShowGuide(isEnabled: isEnabled) {
           TrackpadGuideView(mappedRect: mappedRect)
         }
       }
@@ -76,11 +77,11 @@ extension TrackpadTouchesModifier {
   }
 
   private var showsIndicators: Bool {
-    showsTouchIndicators && mapping != .normalised && trackpadMode.isEnabled
+    showsTouchIndicators && mapping != .normalised && isEnabled
   }
 
   private var context: TrackpadMappingContext {
-    .init(guide: guideVisibility, mode: trackpadMode, mapping: mapping)
+    .init(guide: guideVisibility, mapping: mapping)
   }
 
   private func handleTouches(

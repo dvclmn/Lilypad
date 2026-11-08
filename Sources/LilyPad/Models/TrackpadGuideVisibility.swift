@@ -31,10 +31,10 @@ extension TrackpadGuideVisibility {
     }
   }
   
-  public func shouldShowGuide(for mode: TrackpadMode) -> Bool {
+  public func shouldShowGuide(isEnabled: Bool) -> Bool {
     switch self {
       case .always: true
-      case .drawingMode: mode.isEnabled
+      case .drawingMode: isEnabled
       case .never: false
     }
   }

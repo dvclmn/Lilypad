@@ -9,7 +9,7 @@ import Foundation
 
 struct TrackpadMappingContext {
   let guide: TrackpadGuideVisibility
-  let mode: TrackpadMode
+//  let mode: TrackpadMode
   let mapping: TouchMapping
 }
 
