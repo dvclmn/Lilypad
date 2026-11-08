@@ -38,7 +38,7 @@ struct TrackpadTouchesModifier: ViewModifier {
       }
 
       /// Modifier to handle pointer hiding etc for Trackpad mode
-      .modifier(TrackpadModeModifier(mode: trackpadMode))
+//      .modifier(TrackpadModeModifier(mode: trackpadMode))
   }
 }
 
