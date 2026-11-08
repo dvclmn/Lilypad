@@ -19,8 +19,8 @@ struct TrackpadTouchesModifier: ViewModifier {
 
   /// `nil` measures the modified view. A supplied size skips measurement.
   let viewportSize: CGSize?
-  let mapping: TouchMapping
   let trackpadMode: TrackpadMode
+  let mapping: TouchMapping
   let action: ([TouchPoint], TrackpadMappedRect) -> Void
 
   func body(content: Content) -> some View {
