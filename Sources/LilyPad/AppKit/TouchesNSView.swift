@@ -10,8 +10,8 @@ import AppKit
 /// AppKit `NSView` that captures raw trackpad touch events and forwards
 /// them through ``TrackpadTouchHandler`` for processing.
 ///
-/// Configured to receive indirect touches (trackpad, not Magic Mouse)
-/// including resting/stationary fingers.
+/// Configured to receive indirect touch samples, including resting contacts.
+/// Scroll/gesture events (including Magic Mouse scrolling) are not touch samples.
 class TrackpadTouchesNSView: NSView {
   var onTouchesChanged: TouchesUpdate
 
@@ -41,7 +41,7 @@ extension TrackpadTouchesNSView {
 
   private func processTouches(with event: NSEvent) {
     let touches = touchHandler.processTouches(
-      event.allTouches(),
+      event.touches(matching: .any, in: self),
       timestamp: event.timestamp,
     )
     onTouchesChanged(touches)

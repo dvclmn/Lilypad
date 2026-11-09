@@ -7,15 +7,6 @@
 
 import AppKit
 
-/// A snapshot keeps AppKit event extraction separate from contact bookkeeping.
-/// It also allows lifecycle and velocity regressions to use ordinary values.
-struct TrackpadTouchSample {
-  let identity: any NSObjectProtocol
-  let position: CGPoint
-  let phase: NSTouch.Phase
-  var isResting: Bool = false
-}
-
 /// Processes trackpad events with stable identities, contact order and EMA velocity.
 /// State belongs to this capture session, so the handler has reference semantics.
 final class TrackpadTouchHandler {
@@ -26,6 +17,8 @@ final class TrackpadTouchHandler {
     let id: TouchID
     let order: Int
     var state: TouchState?
+    var lastPosition: CGPoint
+    var deviceSize: CGSize?
   }
 
   // Equality, rather than hash values, distinguishes AppKit identities. The small
@@ -46,14 +39,16 @@ final class TrackpadTouchHandler {
     _ nsTouches: Set<NSTouch>,
     timestamp: TimeInterval,
   ) -> [TouchPoint] {
-    processSamples(nsTouches.map {
-      TrackpadTouchSample(
-        identity: $0.identity,
-        position: $0.normalizedPosition,
-        phase: $0.phase,
-        isResting: $0.isResting
-      )
-    }, timestamp: timestamp)
+    processSamples(
+      nsTouches.filter { $0.type == .indirect }.map {
+        TrackpadTouchSample(
+          identity: $0.identity,
+          position: $0.normalizedPosition,
+          phase: $0.phase,
+          isResting: $0.isResting,
+          deviceSize: $0.deviceSize,
+        )
+      }, timestamp: timestamp,)
   }
 
   /// Simultaneous arrivals are ordered left-to-right, then bottom-to-top.
@@ -75,16 +70,24 @@ final class TrackpadTouchHandler {
     }
 
     for sample in ordered {
+      let isValidPosition =
+        sample.position.x.isFinite && sample.position.y.isFinite
+        && (0...1).contains(sample.position.x) && (0...1).contains(sample.position.y)
       let index: Int
       if let existing = contacts.firstIndex(where: { $0.identity.isEqual(sample.identity) }) {
         index = existing
       } else {
+        // Do not invent a corner touch from a malformed first sample.
+        guard isValidPosition else { continue }
         index = contacts.count
-        contacts.append(Contact(
-          identity: sample.identity,
-          id: TouchID(rawValue: nextID),
-          order: nextOrder
-        ))
+        contacts.append(
+          Contact(
+            identity: sample.identity,
+            id: TouchID(rawValue: nextID),
+            order: nextOrder,
+            lastPosition: sample.position,
+            deviceSize: validatedTouchDeviceSize(sample.deviceSize),
+          ))
         nextID += 1
         nextOrder += 1
       }
@@ -95,10 +98,13 @@ final class TrackpadTouchHandler {
 
       // Invalid samples must not poison the next velocity calculation. A terminal
       // sample still releases the contact, using its last valid position if needed.
-      let isFinitePosition = sample.position.x.isFinite && sample.position.y.isFinite
-      let position = isFinitePosition ? sample.position : (contact.state?.lastPosition ?? .zero)
+      let position = isValidPosition ? sample.position : contact.lastPosition
+      if isValidPosition { contact.lastPosition = position }
+      if let size = validatedTouchDeviceSize(sample.deviceSize) {
+        contact.deviceSize = size
+      }
       var velocity = contact.state?.smoothedVelocity ?? .zero
-      if timestamp.isFinite && isFinitePosition {
+      if timestamp.isFinite && isValidPosition {
         if let previous = contact.state {
           let dt = CGFloat(timestamp - previous.lastTimestamp)
           if dt.isFinite && dt > 0 {
@@ -107,9 +113,10 @@ final class TrackpadTouchHandler {
               prevPosition: previous.lastPosition,
               currentPosition: position,
               factor: smoothingFactor,
-              dt: dt
+              dt: dt,
             )
-            contact.state = TouchState(lastPosition: position, lastTimestamp: timestamp, smoothedVelocity: velocity)
+            contact.state = TouchState(
+              lastPosition: position, lastTimestamp: timestamp, smoothedVelocity: velocity,)
           }
           // Repeated/backwards timestamps leave the valid baseline untouched.
         } else {
@@ -117,17 +124,18 @@ final class TrackpadTouchHandler {
         }
       }
       contacts[index] = contact
-      results.append(TouchPoint(
-        id: contact.id,
-        touchOrder: contact.order,
-        position: position,
-        velocity: velocity,
-        magnitude: hypot(velocity.dx, velocity.dy),
-        pressure: currentPressure,
-        stage: currentStage,
-        phase: sample.phase,
-        isResting: sample.isResting
-      ))
+      results.append(
+        TouchPoint(
+          id: contact.id,
+          touchOrder: contact.order,
+          position: position,
+          velocity: velocity,
+          deviceSize: contact.deviceSize,
+          pressure: currentPressure,
+          stage: currentStage,
+          phase: sample.phase,
+          isResting: sample.isResting,
+        ))
     }
 
     contacts.removeAll { finished.contains($0.id) }

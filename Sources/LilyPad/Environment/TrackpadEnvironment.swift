@@ -11,22 +11,21 @@ extension EnvironmentValues {
   /// Whether Lilypad displays the trackpad mapping guide, independently of capture.
   @Entry public var showsTrackpadGuide: Bool = true
 
-  /// Whether Lilypad displays numbered touch indicators when capture is active.
-  /// Indicators are hidden for normalised mapping, whose positions are not points.
+  /// Whether explicit `TouchIndicatorsView` instances display mapped touches.
   @Entry public var showsTrackpadTouchIndicators: Bool = true
 }
 
 extension View {
-  /// Sets guide visibility for trackpad capture surfaces in this view hierarchy.
+  /// Sets guide visibility for trackpad presentation views in this view hierarchy.
   ///
-  /// Apply after `.trackpadTouches(...)` or to an ancestor of the capture view.
+  /// Apply to an ancestor of `TrackpadGuideView` or `TouchIndicatorsView`.
   public func trackpadGuideVisibility(_ isVisible: Bool) -> some View {
     environment(\.showsTrackpadGuide, isVisible)
   }
 
-  /// Sets whether trackpad capture surfaces display numbered touch indicators.
+  /// Sets whether trackpad presentation views display numbered touch indicators.
   ///
-  /// Apply after `.trackpadTouches(...)` or to an ancestor of the capture view.
+  /// Apply to an ancestor of `TrackpadGuideView` or `TouchIndicatorsView`.
   /// This setting changes presentation only; touch callbacks are unaffected.
   public func trackpadTouchIndicators(_ isVisible: Bool) -> some View {
     environment(\.showsTrackpadTouchIndicators, isVisible)

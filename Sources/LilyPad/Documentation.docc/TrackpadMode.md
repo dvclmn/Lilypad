@@ -1,20 +1,7 @@
-# Capture enablement and guide visibility
+# Capture enablement and presentation
 
-Lilypad accepts independent Boolean values for capture and guide presentation. The consuming application owns any drawing-mode state, visibility policy and pointer behaviour.
+The consumer owns interaction mode, pointer behaviour and active-contact state.
 
-```swift
-@State private var capturesTouches = false
+`trackpadTouches(isEnabled:perform:)` controls capture only. Display a `TrackpadGuideView` and `TouchIndicatorsView` separately when needed. The existing `trackpadGuideVisibility(_:)` and `trackpadTouchIndicators(_:)` Boolean environment modifiers configure these explicit presentation views; they do not cause capture to create overlays.
 
-var body: some View {
-  MyInputSurface()
-    .trackpadTouches(isEnabled: capturesTouches) { touches, mappedRect in
-      // Process input.
-    }
-    .trackpadGuideVisibility(capturesTouches)
-    .toolbar {
-      Toggle("Capture touches", isOn: $capturesTouches)
-    }
-}
-```
-
-Passing `capturesTouches` to both modifiers shows the guide only while capture is enabled. Pass `true` to show the guide even when capture is disabled, or `false` to hide it. Guide visibility does not affect touch callbacks. Both settings default to `true`.
+A guide can remain visible while capture is disabled. Clear active input when disabling or removing capture, and hide or empty its indicators. The consumer decides whether disabling should complete or cancel an interaction.

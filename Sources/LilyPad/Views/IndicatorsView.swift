@@ -11,35 +11,40 @@ import SwiftUI
 ///
 /// Finger numbers are stable — they reflect ``TouchPoint/touchOrder``,
 /// so the first finger placed stays "1" even as other fingers come and go.
-struct TouchIndicatorsView: View {
+public struct TouchIndicatorsView: View {
+  @Environment(\.showsTrackpadTouchIndicators) private var isVisible
 
-  let touches: [TouchPoint]
+  public let touches: [MappedTouchPoint]
+
+  public init(touches: [MappedTouchPoint]) { self.touches = touches }
 
   private let indicatorDiameter: CGFloat = 40
 
-  var body: some View {
-    ForEach(touches) { touch in
-      Circle()
-        .fill(Color.blue.opacity(0.7))
-        .frame(width: indicatorDiameter)
-        .overlay {
-          Text("\(touch.touchOrder + 1)")
-            .font(.title2)
-            .monospacedDigit()
-        }
-        .overlay(alignment: .bottom) {
-          Text(positionLabel(touch.position))
-            .monospaced()
-            .font(.caption2)
-            .fixedSize()
-            .offset(y: -indicatorDiameter * 1.15)
-        }
-        .position(touch.position)
+  public var body: some View {
+    if isVisible {
+      ForEach(touches) { touch in
+        Circle()
+          .fill(Color.blue.opacity(0.7))
+          .frame(width: indicatorDiameter)
+          .overlay {
+            Text("\(touch.touchOrder + 1)")
+              .font(.title2)
+              .monospacedDigit()
+          }
+          .overlay(alignment: .bottom) {
+            Text(positionLabel(touch.position))
+              .monospaced()
+              .font(.caption2)
+              .fixedSize()
+              .offset(y: -indicatorDiameter * 1.15)
+          }
+          .position(touch.position)
+      }
+      .allowsHitTesting(false)
     }
-    .allowsHitTesting(false)
   }
 
   private func positionLabel(_ point: CGPoint) -> String {
-    "\(Int(point.x)), \(Int(point.y))"
+    "\(Double(point.x).formatted(.number.precision(.fractionLength(0)))), \(Double(point.y).formatted(.number.precision(.fractionLength(0))))"
   }
 }

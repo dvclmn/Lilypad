@@ -80,9 +80,9 @@ struct ContactTests {
     let handler = TrackpadTouchHandler()
     handler.smoothingFactor = 1
     _ = handler.processSamples([sample(1)], timestamp: 1)
-    _ = handler.processSamples([sample(1, x: 100)], timestamp: 1)
-    _ = handler.processSamples([sample(1, x: 100)], timestamp: 0)
-    _ = handler.processSamples([sample(1, x: 100)], timestamp: .nan)
+    _ = handler.processSamples([sample(1, x: 0.75)], timestamp: 1)
+    _ = handler.processSamples([sample(1, x: 0.75)], timestamp: 0)
+    _ = handler.processSamples([sample(1, x: 0.75)], timestamp: .nan)
     let next = handler.processSamples([sample(1, x: 1)], timestamp: 2)[0]
     #expect(next.velocity.dx == 1)
     #expect(next.magnitude == 1)
@@ -96,7 +96,7 @@ struct ContactTests {
     #expect(invalid.position == first.position)
     let next = handler.processSamples([sample(1, x: 1)], timestamp: 3)[0]
     #expect(next.velocity.dx == 0.25)
-    _ = handler.processSamples([sample(1, x: .infinity, phase: .ended)], timestamp: .nan)
+    _ = handler.processSamples([sample(1, x: CGFloat.infinity, phase: .ended)], timestamp: .nan)
     let restarted = handler.processSamples([sample(1)], timestamp: 4)[0]
     #expect(restarted.id != first.id)
     #expect(restarted.touchOrder == 0)
@@ -118,63 +118,153 @@ struct ContactTests {
 }
 
 struct MappingTests {
-  @Test func customAspectRatioIsUsed() throws {
-    let context = TrackpadMappingContext(mapping: .fit)
-    let mapped = try #require(context.mappedSize(in: CGSize(width: 200, height: 100), aspectRatio: 1))
-    #expect(mapped.rect == CGRect(x: 50, y: 0, width: 100, height: 100))
+  private let source = CGSize(width: 160, height: 100)
+
+  @Test func fitFillAndStretchHaveExplicitBounds() throws {
+    let destination = CGRect(x: 20, y: 30, width: 200, height: 100)
+    let square = CGSize(width: 1, height: 1)
+    let fit = try #require(TrackpadMapping(sourceSize: square, destination: destination))
+    let fill = try #require(TrackpadMapping(sourceSize: square, destination: destination, scaling: .fill))
+    let stretch = try #require(TrackpadMapping(destination: destination, scaling: .stretch))
+    #expect(fit.mappedRect == CGRect(x: 70, y: 30, width: 100, height: 100))
+    #expect(fill.mappedRect == CGRect(x: 20, y: -20, width: 200, height: 200))
+    #expect(stretch.mappedRect == destination)
+    // Fill genuinely maps beyond the target; it does not clamp or discard.
+    #expect(fill.position(from: .zero) == CGPoint(x: 20, y: 180))
+    #expect(fill.position(from: CGPoint(x: 1, y: 1)) == CGPoint(x: 220, y: -20))
   }
 
-  @Test func fitAndFillPreserveAspectRatio() throws {
-    let size = CGSize(width: 200, height: 100)
-    let fit = try #require(TrackpadMappedRect.makeRect(in: size, mapping: .fit, sourceAspectRatio: 1))
-    let fill = try #require(TrackpadMappedRect.makeRect(in: size, mapping: .fill, sourceAspectRatio: 1))
-    #expect(fit.rect == CGRect(x: 50, y: 0, width: 100, height: 100))
-    #expect(fill.rect == CGRect(x: 0, y: -50, width: 200, height: 200))
+  @Test func cornersAndCentreUseTopLeftDestinationCoordinates() throws {
+    let mapping = try #require(TrackpadMapping(sourceSize: source,
+      destination: CGRect(x: 30, y: 40, width: 320, height: 200)))
+    #expect(mapping.position(from: .zero) == CGPoint(x: 30, y: 240))
+    #expect(mapping.position(from: CGPoint(x: 1, y: 0)) == CGPoint(x: 350, y: 240))
+    #expect(mapping.position(from: CGPoint(x: 0, y: 1)) == CGPoint(x: 30, y: 40))
+    #expect(mapping.position(from: CGPoint(x: 1, y: 1)) == CGPoint(x: 350, y: 40))
+    #expect(mapping.position(from: CGPoint(x: 0.5, y: 0.5)) == CGPoint(x: 190, y: 140))
+  }
+
+  @Test(arguments: TouchMapping.allCases)
+  func velocityMatchesPositionDifference(_ scaling: TouchMapping) throws {
+    let mapping = try #require(TrackpadMapping(sourceSize: source,
+      destination: CGRect(x: -25, y: 80, width: 300, height: 400), scaling: scaling))
+    let start = CGPoint(x: 0.25, y: 0.5)
+    let velocity = CGVector(dx: 0.5, dy: -0.25)
+    let dt: CGFloat = 0.125
+    let end = CGPoint(x: start.x + velocity.dx * dt, y: start.y + velocity.dy * dt)
+    let a = mapping.position(from: start)
+    let b = mapping.position(from: end)
+    let mappedVelocity = mapping.velocity(from: velocity)
+    #expect(abs((b.x - a.x) / dt - mappedVelocity.dx) < 1e-9)
+    #expect(abs((b.y - a.y) / dt - mappedVelocity.dy) < 1e-9)
+    #expect(mapping.velocity(from: .zero).dx == 0)
+    #expect(mapping.velocity(from: .zero).dy == 0)
+  }
+
+  @Test func mappedTouchPreservesSourceAndTransformsVelocityAgain() throws {
+    let mapping = try #require(TrackpadMapping(sourceSize: source,
+      destination: CGRect(x: 10, y: 20, width: 320, height: 200)))
+    let touch = TouchPoint(id: TouchID(rawValue: 7), touchOrder: 3,
+      position: CGPoint(x: 0.25, y: 0.75), velocity: CGVector(dx: 0.5, dy: 0.25),
+      deviceSize: source, pressure: 0.7, stage: 2, phase: .cancelled, isResting: true)
+    let mapped = mapping.map(touch)
+    #expect(mapped.position == CGPoint(x: 90, y: 70))
+    #expect(mapped.velocity.dx == 160)
+    #expect(mapped.velocity.dy == -50)
+    #expect(mapped.magnitude == hypot(160, 50))
+    // Rotation, nonuniform scale and translation exercise more than zoom alone.
+    let transformed = mapped.transformed(by: CGAffineTransform(a: 0, b: 2, c: -3, d: 0, tx: 11, ty: 17))
+    #expect(transformed.position == CGPoint(x: -199, y: 197))
+    #expect(transformed.velocity.dx == 150)
+    #expect(transformed.velocity.dy == 320)
+    #expect(transformed.magnitude == hypot(150, 320))
+    #expect(transformed.source.position == touch.position)
+    #expect(transformed.source.deviceSize == source)
+    #expect(transformed.id == touch.id)
+    #expect(transformed.touchOrder == 3)
+    #expect(transformed.phase == .cancelled)
+    #expect(transformed.pressure == 0.7)
+    #expect(transformed.stage == 2)
+    #expect(transformed.isResting)
   }
 
   @Test(arguments: [CGFloat.zero, -1, .infinity, -.infinity, .nan])
   func invalidGeometryIsRejected(_ value: CGFloat) {
-    for mapping in TouchMapping.allCases {
-      #expect(TrackpadMappedRect.makeRect(in: CGSize(width: value, height: 100), mapping: mapping) == nil)
-      #expect(TrackpadMappedRect.makeRect(in: CGSize(width: 100, height: value), mapping: mapping) == nil)
-      #expect(TrackpadMappedRect.makeRect(in: CGSize(width: 100, height: 100), mapping: mapping, sourceAspectRatio: value) == nil)
+    for scaling in TouchMapping.allCases {
+      #expect(TrackpadMapping(sourceSize: source,
+        destination: CGRect(x: 0, y: 0, width: value, height: 100), scaling: scaling) == nil)
+      #expect(TrackpadMapping(sourceSize: source,
+        destination: CGRect(x: 0, y: 0, width: 100, height: value), scaling: scaling) == nil)
+    }
+    for scaling in [TouchMapping.fit, .fill] {
+      #expect(TrackpadMapping(sourceSize: CGSize(width: value, height: 100),
+        destination: CGRect(x: 0, y: 0, width: 100, height: 100), scaling: scaling) == nil)
     }
   }
 
-  @Test func overflowingMappingIsRejected() {
-    #expect(TrackpadMappedRect.makeRect(
-      in: CGSize(width: .greatestFiniteMagnitude, height: 100),
-      mapping: .fill,
-      sourceAspectRatio: 2
-    ) == nil)
+  @Test func unknownSourceAndOverflowHaveNoInventedFallback() {
+    let destination = CGRect(x: 0, y: 0, width: 200, height: 100)
+    #expect(TrackpadMapping(destination: destination) == nil)
+    #expect(TrackpadMapping(destination: destination, scaling: .fill) == nil)
+    #expect(TrackpadMapping(destination: destination, scaling: .stretch) != nil)
+    #expect(TrackpadMapping(sourceSize: CGSize(width: 1, height: 2),
+      destination: CGRect(x: 0, y: 0, width: CGFloat.greatestFiniteMagnitude, height: 100), scaling: .fill) == nil)
+    #expect(TrackpadMapping(destination: CGRect(x: CGFloat.infinity, y: 0, width: 10, height: 10), scaling: .stretch) == nil)
+    #expect(TrackpadMapping(destination: CGRect(x: CGFloat.greatestFiniteMagnitude, y: 0, width: 1, height: 10), scaling: .stretch) == nil)
   }
 
-  @Test func positionAndVelocityShareTransform() throws {
-    let rect = try #require(TrackpadMappedRect.makeRect(
-      in: CGSize(width: 200, height: 200), mapping: .fit, sourceAspectRatio: 0.5
-    ))
-    let touch = TouchPoint(
-      id: TouchID(rawValue: 7), touchOrder: 3,
-      position: CGPoint(x: 0.25, y: 0.75),
-      velocity: CGVector(dx: 0.5, dy: 0.25), magnitude: hypot(0.5, 0.25),
-      pressure: 0.7, stage: 2, phase: .ended, isResting: true
-    )
-    let mapped = TouchMapping.fit.mapTouches([touch], in: rect)[0]
-    #expect(mapped.position == CGPoint(x: 50, y: 75))
-    #expect(mapped.velocity.dx == 100)
-    #expect(mapped.velocity.dy == -25)
-    #expect(mapped.magnitude == hypot(100, 25))
-    #expect(mapped.id == touch.id)
-    #expect(mapped.touchOrder == touch.touchOrder)
-    #expect(mapped.pressure == touch.pressure)
-    #expect(mapped.stage == touch.stage)
-    #expect(mapped.phase == touch.phase)
-    #expect(mapped.isResting)
+  @Test func physicalProportionsMatterButAbsoluteDeviceSizeDoesNot() throws {
+    let target = CGRect(x: 0, y: 0, width: 400, height: 400)
+    let a = try #require(TrackpadMapping(sourceSize: source, destination: target))
+    let b = try #require(TrackpadMapping(sourceSize: CGSize(width: 320, height: 200), destination: target))
+    #expect(a == b)
+    // Equal physical travel along each device axis should map to equal lengths.
+    let x = a.velocity(from: CGVector(dx: 10 / source.width, dy: 0))
+    let y = a.velocity(from: CGVector(dx: 0, dy: 10 / source.height))
+    #expect(abs(x.dx + y.dy) < 1e-9)
+  }
+}
 
-    let raw = TouchMapping.normalised.mapTouches([touch], in: rect)[0]
-    #expect(raw.position == touch.position)
-    #expect(raw.velocity.dx == touch.velocity.dx)
-    #expect(raw.velocity.dy == touch.velocity.dy)
-    #expect(raw.magnitude == touch.magnitude)
+struct NormalisedCaptureTests {
+  @Test func malformedSamplesNeverEscapeUnitSquare() {
+    let handler = TrackpadTouchHandler()
+    #expect(handler.processSamples([sample(1, x: -0.01)], timestamp: 0).isEmpty)
+    let first = handler.processSamples([sample(1, x: 0.5)], timestamp: 1)[0]
+    let invalid = handler.processSamples([sample(1, x: 1.01)], timestamp: 2)[0]
+    #expect(invalid.position == first.position)
+    let ended = handler.processSamples([sample(1, x: .nan, phase: .ended)], timestamp: 3)[0]
+    #expect(ended.id == first.id)
+    #expect(ended.position == first.position)
+    #expect(ended.phase == .ended)
+    #expect(handler.processSamples([sample(2)], timestamp: 4)[0].touchOrder == 0)
+  }
+
+  @Test func deviceGeometryIsPerContactAndSurvivesMissingTerminalMetadata() {
+    let handler = TrackpadTouchHandler()
+    var first = sample(1, x: 0.25)
+    first.deviceSize = CGSize(width: 160, height: 100)
+    var second = sample(2, x: 0.75)
+    second.deviceSize = CGSize(width: 120, height: 120)
+    let initial = handler.processSamples([first, second], timestamp: 1)
+    #expect(initial[0].deviceSize == first.deviceSize)
+    #expect(initial[1].deviceSize == second.deviceSize)
+    let terminal = handler.processSamples([sample(1, phase: .ended)], timestamp: 2)[0]
+    #expect(terminal.deviceSize == first.deviceSize)
+    var invalid = sample(3)
+    invalid.deviceSize = CGSize(width: CGFloat.nan, height: 100)
+    #expect(handler.processSamples([invalid], timestamp: 3)[0].deviceSize == nil)
+  }
+
+  @Test func upwardMovementHasPositiveNormalisedVelocity() {
+    let handler = TrackpadTouchHandler()
+    handler.smoothingFactor = 1
+    let identity = ContactIdentity(1)
+    _ = handler.processSamples([TrackpadTouchSample(identity: identity,
+      position: CGPoint(x: 0.25, y: 0.25), phase: .began)], timestamp: 1)
+    let next = handler.processSamples([TrackpadTouchSample(identity: identity,
+      position: CGPoint(x: 0.75, y: 0.5), phase: .moved)], timestamp: 1.5)[0]
+    #expect(next.velocity.dx == 1)
+    #expect(next.velocity.dy == 0.5)
+    #expect(next.magnitude == hypot(1, 0.5))
   }
 }

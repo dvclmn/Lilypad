@@ -8,7 +8,7 @@
 #if canImport(AppKit)
 import SwiftUI
 
-/// Callback signature for receiving ordered touch updates.
+/// Callback signature for receiving ordered, normalised touch updates.
 /// Touches are sorted by the order each finger first made contact.
 public typealias TouchesUpdate = ([TouchPoint]) -> Void
 

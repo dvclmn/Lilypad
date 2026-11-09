@@ -1,6 +1,6 @@
 //
 //  TrackpadTouches+ViewExt.swift
-//  InteractionKit
+//  Lilypad
 //
 //  Created by Dave Coleman on 6/4/2026.
 //
@@ -8,74 +8,21 @@
 import SwiftUI
 
 extension View {
-
-  /// Captures ordered trackpad touch updates mapped into this view's bounds.
+  /// Captures normalised trackpad touches without measuring a mapping target.
   ///
-  /// Lilypad reads the modified view's size inside an overlay. No canvas size,
-  /// zoom state or ancestor viewport environment is required. The overlay does
-  /// not determine the modified view's layout; apply this to a sized surface.
+  /// Positions use a bottom-left origin, X rightwards, Y upwards, and 0...1 on
+  /// each axis. Velocity uses those same axis units per second. Capture does
+  /// not map, clip, clamp or display input. Use `TrackpadMapping` separately.
   ///
-  /// With `.fit` or `.fill`, positions use local view coordinates with a top-left
-  /// origin. With `.normalised`, positions remain in 0–1 trackpad coordinates
-  /// with a bottom-left origin, and velocity remains in those units per second.
-  /// The returned rectangle always describes the mapping in local view points.
-  ///
-  /// Use `.trackpadGuideVisibility(_:)` and `.trackpadTouchIndicators(_:)` after
-  /// this modifier, or on an ancestor, to configure presentation.
-  ///
-  /// - Parameters:
-  ///   - mapping: Fits the trackpad's aspect ratio within the view, fills the view
-  ///     with cropping, or delivers untransformed normalised touches.
-  ///   - isEnabled: Whether capture is enabled. Defaults to `true`.
-  ///   - action: Receives each touch update in first-contact order and the mapped
-  ///     rectangle. Updates include ended and cancelled touches, and may contain
-  ///     only a subset of the fingers currently touching the trackpad.
+  /// Updates include ended/cancelled contacts and may contain only a subset
+  /// of active fingers, in first-contact order. Maintain active contacts by ID.
+  /// The receiving view still needs AppKit event routing and useful layout.
+  /// Disabling/removing capture ends its session; consumers must clear their
+  /// interaction state, as the removed view cannot deliver terminal events.
   public func trackpadTouches(
     isEnabled: Bool = true,
-    mapping: TouchMapping = .fit,
-    perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
+    perform action: @escaping TouchesUpdate
   ) -> some View {
-    modifier(
-      TrackpadTouchesModifier(
-        isEnabled: isEnabled,
-        viewportSize: nil,
-        mapping: mapping,
-        action: action,
-      )
-    )
+    modifier(TrackpadTouchesModifier(isEnabled: isEnabled, action: action))
   }
-
-  /// Captures trackpad touches using a viewport size already owned by the caller.
-  ///
-  /// This overload performs no geometry measurement. Use it when a parent already
-  /// measures the same capture surface and shares its size with several tools.
-  /// Supply the surface's untransformed local size in points, rather than an
-  /// artwork size, a global frame or another view's safe-area size.
-  ///
-  /// Positions and the mapped rectangle use a local zero origin; `.normalised`
-  /// leaves touch coordinates unchanged. Geometry updates take effect without an
-  /// artificial delay. Zero, negative or non-finite sizes suspend capture and its
-  /// overlays until valid geometry arrives. No fallback size is substituted.
-  ///
-  /// - Parameters:
-  ///   - viewportSize: The current size of the capture surface in local points.
-  ///   - mapping: How trackpad coordinates map into the viewport.
-  ///   - isEnabled: Whether capture is enabled. Defaults to `true`.
-  ///   - action: Receives ordered touch updates and the local mapping rectangle.
-  public func trackpadTouches(
-    viewportSize: CGSize,
-    isEnabled: Bool = true,
-    mapping: TouchMapping = .fit,
-    perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
-  ) -> some View {
-    modifier(
-      TrackpadTouchesModifier(
-        isEnabled: isEnabled,
-        viewportSize: viewportSize,
-        mapping: mapping,
-        action: action,
-      )
-    )
-  }
-
 }
