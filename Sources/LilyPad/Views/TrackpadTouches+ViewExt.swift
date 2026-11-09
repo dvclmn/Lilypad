@@ -73,7 +73,6 @@ extension View {
       TrackpadTouchesModifier(
         isEnabled: isEnabled,
         viewportSize: viewportSize,
-//        trackpadMode: mode,
         mapping: mapping,
         action: action,
       )
@@ -87,57 +86,30 @@ extension View {
   /// is now ignored: capture starts as soon as valid geometry is available.
   /// A `nil` viewport suspends capture until the caller supplies a valid rectangle.
   /// The explicit presentation arguments take precedence over inherited settings.
-  @available(
-    *, deprecated,
-    message: "Use trackpadTouches(mapping:mode:perform:) or the viewportSize overload, with trackpadGuideVisibility(_:) and trackpadTouchIndicators(_:)."
-  )
-  public func trackpadTouches(
-    canvasSize: CGSize,
-    viewportRect: CGRect?,
-    zoomLevel: Double,
-    zoomRange: ClosedRange<Double>,
-    mapping: TouchMapping = .fit,
-    mode: TrackpadMode = .inactive,
-    guideVisibility: TrackpadGuideVisibility = .always,
-    showsTouchIndicators: Bool = true,
-    viewportRectWaitDuration: TimeInterval = 1,
-    perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
-  ) -> some View {
-    trackpadTouches(
-      viewportSize: viewportRect?.size ?? .zero,
-      mode: mode,
-      mapping: mapping,
-      perform: action,
-    )
-    .trackpadGuideVisibility(guideVisibility)
-    .trackpadTouchIndicators(showsTouchIndicators)
-  }
+//  @available(
+//    *, deprecated,
+//    message: "Use trackpadTouches(mapping:mode:perform:) or the viewportSize overload, with trackpadGuideVisibility(_:) and trackpadTouchIndicators(_:)."
+//  )
+//  public func trackpadTouches(
+//    canvasSize: CGSize,
+//    viewportRect: CGRect?,
+//    zoomLevel: Double,
+//    zoomRange: ClosedRange<Double>,
+//    mapping: TouchMapping = .fit,
+//    mode: TrackpadMode = .inactive,
+//    guideVisibility: TrackpadGuideVisibility = .always,
+//    showsTouchIndicators: Bool = true,
+//    viewportRectWaitDuration: TimeInterval = 1,
+//    perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
+//  ) -> some View {
+//    trackpadTouches(
+//      viewportSize: viewportRect?.size ?? .zero,
+//      mode: mode,
+//      mapping: mapping,
+//      perform: action,
+//    )
+//    .trackpadGuideVisibility(guideVisibility)
+//    .trackpadTouchIndicators(showsTouchIndicators)
+//  }
 }
 
-// MARK: - Presentation
-
-extension EnvironmentValues {
-  /// When Lilypad displays the trackpad mapping guide.
-  @Entry public var trackpadGuideVisibility: TrackpadGuideVisibility = .always
-
-  /// Whether Lilypad displays numbered touch indicators when capture is active.
-  /// Indicators are hidden for normalised mapping, whose positions are not points.
-  @Entry public var showsTrackpadTouchIndicators: Bool = true
-}
-
-extension View {
-  /// Sets guide visibility for trackpad capture surfaces in this view hierarchy.
-  ///
-  /// Apply after `.trackpadTouches(...)` or to an ancestor of the capture view.
-  public func trackpadGuideVisibility(_ visibility: TrackpadGuideVisibility) -> some View {
-    environment(\.trackpadGuideVisibility, visibility)
-  }
-
-  /// Sets whether trackpad capture surfaces display numbered touch indicators.
-  ///
-  /// Apply after `.trackpadTouches(...)` or to an ancestor of the capture view.
-  /// This setting changes presentation only; touch callbacks are unaffected.
-  public func trackpadTouchIndicators(_ isVisible: Bool) -> some View {
-    environment(\.showsTrackpadTouchIndicators, isVisible)
-  }
-}
