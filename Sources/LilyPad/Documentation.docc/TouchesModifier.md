@@ -8,12 +8,12 @@ Apply `.trackpadTouches(...)` to a view whose bounds define the input surface:
 
 ```swift
 Color.clear
-  .trackpadTouches(mode: .active(hidesPointer: false)) { touches, mappedRect in
+  .trackpadTouches(isEnabled: true) { touches, mappedRect in
     for touch in touches {
       print("Finger \(touch.touchOrder + 1): \(touch.position)")
     }
   }
-  .trackpadGuideVisibility(.drawingMode)
+  .trackpadGuideVisibility(true)
   .trackpadTouchIndicators(true)
 ```
 
@@ -21,7 +21,7 @@ The modifier reads the surface's size inside an overlay. It does not size the un
 
 `.fit` maps the trackpad's aspect ratio within those bounds, while `.fill` fills them with cropping. Both produce positions in local points with a top-left origin, and velocities in points per second. `.normalised` leaves touch positions and velocities unchanged, using the trackpad's bottom-left origin. The returned `TrackpadMappedRect.rect` is always in local viewport points; for `.normalised`, it describes the viewport guide rather than a transform applied to the touches.
 
-The callback delivers touch updates in first-contact order, including ended and cancelled touches. An update may contain only some active fingers. Capture defaults to `.inactive`; explicitly pass an active mode when input is wanted.
+The callback delivers touch updates in first-contact order, including ended and cancelled touches. An update may contain only some active fingers. Capture defaults to enabled; pass `isEnabled: false` to suspend input. Guide visibility is independent of capture enablement.
 
 ## Share geometry when it is already available
 
@@ -32,7 +32,7 @@ GeometryReader { geometry in
   Color.clear
     .trackpadTouches(
       viewportSize: geometry.size,
-      mode: .active(hidesPointer: false)
+      isEnabled: true
     ) { touches, mappedRect in
       // Use the same geometry.size for other tools on this surface.
     }
@@ -45,16 +45,16 @@ Zero, negative and non-finite dimensions suspend capture and its overlays until 
 
 ## Configure presentation through the environment
 
-`.trackpadTouches(...)` installs the internal `TrackpadTouchesModifier`. That modifier reads `EnvironmentValues.trackpadGuideVisibility` and `EnvironmentValues.showsTrackpadTouchIndicators` to decide which visual overlays to display. The AppKit touch handler does not read these settings.
+`.trackpadTouches(...)` installs the internal `TrackpadTouchesModifier`. That modifier reads `EnvironmentValues.showsTrackpadGuide` and `EnvironmentValues.showsTrackpadTouchIndicators` to decide which visual overlays to display. The AppKit touch handler does not read these settings.
 
 The two focused presentation modifiers write those values into the environment:
 
 ```swift
 Color.clear
-  .trackpadTouches(mode: .active(hidesPointer: false)) { touches, mappedRect in
+  .trackpadTouches(isEnabled: true) { touches, mappedRect in
     // Handle input regardless of whether indicators are visible.
   }
-  .trackpadGuideVisibility(.never)
+  .trackpadGuideVisibility(false)
   .trackpadTouchIndicators(false)
 ```
 
@@ -73,12 +73,12 @@ GeometryReader { geometry in
   Color.clear
     .trackpadTouches(
       viewportSize: geometry.size,
-      mode: store.drawingMode
+      isEnabled: capturesTouches
     ) { touches, mappedRect in
       updateIfChanged(&store.trackpadMappedRect, to: mappedRect)
       handleTouches(touches)
     }
-    .trackpadGuideVisibility(store.preferences.trackpadPreferences.guideVisibility)
+    .trackpadGuideVisibility(showsGuide)
     .trackpadTouchIndicators(store.preferences.showingTouchIndicators)
 }
 ```
@@ -87,10 +87,10 @@ Alternatively, remove the outer `GeometryReader` and omit `viewportSize:` to let
 
 ## Migrate existing clients
 
-The original overload remains available with a deprecation warning, so clients can migrate independently. Its `canvasSize`, `zoomLevel` and `zoomRange` arguments remain unused. Its `viewportRect` contributes only its size; a `nil` rectangle continues to suspend capture. Its explicit guide and indicator arguments override inherited presentation settings.
+Use `isEnabled:` instead of a trackpad mode. Replace enum guide arguments with a Boolean: `.always` becomes `true`, `.never` becomes `false`, and a conditional policy becomes a Boolean resolved by the consumer. The environment key is now `showsTrackpadGuide`. Drawing-mode preferences and pointer behaviour belong in the consuming application.
 
-`viewportRectWaitDuration` is now ignored. Previously it delayed installing capture even when geometry was already available. Both old and new overloads now start capture as soon as valid geometry is supplied, without showing a message about a missing environment value.
+The former geometry overload is no longer available. Remove `canvasSize`, `zoomLevel`, `zoomRange` and `viewportRectWaitDuration`; pass `viewportSize: viewportRect?.size ?? .zero` when the caller owns the geometry.
 
 ## Review the integration
 
-Check input immediately after opening a view, after resizing it and after changing inspector or sidebar visibility. Compare local measurement with an explicit size for the same surface. Confirm guide settings inherit from an ancestor and can be overridden locally, indicators do not affect callbacks, inactive mode stops capture, and `.normalised` retains its original coordinate convention. Check pointer restoration when changing mode, leaving the view and switching applications.
+Check input immediately after opening a view, after resizing it and after changing inspector or sidebar visibility. Compare local measurement with an explicit size for the same surface. Confirm guide settings inherit from an ancestor and can be overridden locally, indicators do not affect callbacks, disabled capture stops callbacks, and `.normalised` retains its original coordinate convention. Verify pointer behaviour separately in the consuming application.

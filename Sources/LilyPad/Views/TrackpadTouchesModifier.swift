@@ -14,13 +14,12 @@ import SwiftUI
 /// it into state or publishing it through the environment.
 struct TrackpadTouchesModifier: ViewModifier {
   @State private var touchesForIndicators: [TouchID: TouchPoint] = [:]
-  @Environment(\.trackpadGuideVisibility) private var guideVisibility
+  @Environment(\.showsTrackpadGuide) private var showsGuide
   @Environment(\.showsTrackpadTouchIndicators) private var showsTouchIndicators
 
-  /// `nil` measures the modified view. A supplied size skips measurement.
   let isEnabled: Bool
+  /// `nil` measures the modified view. A supplied size skips measurement.
   let viewportSize: CGSize?
-//  let trackpadMode: TrackpadMode
   let mapping: TouchMapping
   let action: ([TouchPoint], TrackpadMappedRect) -> Void
 
@@ -37,9 +36,6 @@ struct TrackpadTouchesModifier: ViewModifier {
           }
         }
       }
-
-      /// Modifier to handle pointer hiding etc for Trackpad mode
-//      .modifier(TrackpadModeModifier(mode: trackpadMode))
   }
 }
 
@@ -68,7 +64,7 @@ extension TrackpadTouchesModifier {
           )
         }
 
-        if guideVisibility.shouldShowGuide(isEnabled: isEnabled) {
+        if showsGuide {
           TrackpadGuideView(mappedRect: mappedRect)
         }
       }
@@ -81,7 +77,7 @@ extension TrackpadTouchesModifier {
   }
 
   private var context: TrackpadMappingContext {
-    .init(guide: guideVisibility, mapping: mapping)
+    .init(mapping: mapping)
   }
 
   private func handleTouches(

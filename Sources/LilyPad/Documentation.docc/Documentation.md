@@ -6,12 +6,12 @@ Touch data can support drawing, gesture experiments and other interactions witho
 
 ```swift
 MyInputSurface()
-  .trackpadTouches(mode: .active(hidesPointer: false)) { touches, mappedRect in
+  .trackpadTouches(isEnabled: true) { touches, mappedRect in
     for touch in touches {
       print("Finger \(touch.touchOrder + 1): \(touch.position)")
     }
   }
-  .trackpadGuideVisibility(.drawingMode)
+  .trackpadGuideVisibility(true)
   .trackpadTouchIndicators(true)
 ```
 
@@ -25,5 +25,4 @@ Lilypad measures the modified view by default. Pass `viewportSize:` when a paren
 - ``TouchPoint``
 - ``TouchMapping``
 - ``TrackpadMappedRect``
-- ``TrackpadMode``
-- ``TrackpadGuideVisibility``
+- <doc:TrackpadMode>

@@ -119,7 +119,7 @@ struct ContactTests {
 
 struct MappingTests {
   @Test func customAspectRatioIsUsed() throws {
-    let context = TrackpadMappingContext(guide: .always, mode: .inactive, mapping: .fit)
+    let context = TrackpadMappingContext(mapping: .fit)
     let mapped = try #require(context.mappedSize(in: CGSize(width: 200, height: 100), aspectRatio: 1))
     #expect(mapped.rect == CGRect(x: 50, y: 0, width: 100, height: 100))
   }

@@ -26,8 +26,7 @@ extension View {
   /// - Parameters:
   ///   - mapping: Fits the trackpad's aspect ratio within the view, fills the view
   ///     with cropping, or delivers untransformed normalised touches.
-  ///   - mode: Whether capture is enabled and whether the pointer is hidden.
-  ///     Defaults to `.inactive`.
+  ///   - isEnabled: Whether capture is enabled. Defaults to `true`.
   ///   - action: Receives each touch update in first-contact order and the mapped
   ///     rectangle. Updates include ended and cancelled touches, and may contain
   ///     only a subset of the fingers currently touching the trackpad.
@@ -61,7 +60,7 @@ extension View {
   /// - Parameters:
   ///   - viewportSize: The current size of the capture surface in local points.
   ///   - mapping: How trackpad coordinates map into the viewport.
-  ///   - mode: Whether capture is enabled and whether the pointer is hidden.
+  ///   - isEnabled: Whether capture is enabled. Defaults to `true`.
   ///   - action: Receives ordered touch updates and the local mapping rectangle.
   public func trackpadTouches(
     viewportSize: CGSize,
@@ -79,37 +78,4 @@ extension View {
     )
   }
 
-  /// Compatibility overload for existing clients.
-  ///
-  /// Only `viewportRect.size` is used for geometry. `canvasSize`, `zoomLevel` and
-  /// `zoomRange` had no effect on mapping and remain unused. The waiting duration
-  /// is now ignored: capture starts as soon as valid geometry is available.
-  /// A `nil` viewport suspends capture until the caller supplies a valid rectangle.
-  /// The explicit presentation arguments take precedence over inherited settings.
-//  @available(
-//    *, deprecated,
-//    message: "Use trackpadTouches(mapping:mode:perform:) or the viewportSize overload, with trackpadGuideVisibility(_:) and trackpadTouchIndicators(_:)."
-//  )
-//  public func trackpadTouches(
-//    canvasSize: CGSize,
-//    viewportRect: CGRect?,
-//    zoomLevel: Double,
-//    zoomRange: ClosedRange<Double>,
-//    mapping: TouchMapping = .fit,
-//    mode: TrackpadMode = .inactive,
-//    guideVisibility: TrackpadGuideVisibility = .always,
-//    showsTouchIndicators: Bool = true,
-//    viewportRectWaitDuration: TimeInterval = 1,
-//    perform action: @escaping ([TouchPoint], TrackpadMappedRect) -> Void,
-//  ) -> some View {
-//    trackpadTouches(
-//      viewportSize: viewportRect?.size ?? .zero,
-//      mode: mode,
-//      mapping: mapping,
-//      perform: action,
-//    )
-//    .trackpadGuideVisibility(guideVisibility)
-//    .trackpadTouchIndicators(showsTouchIndicators)
-//  }
 }
-

@@ -1,26 +1,20 @@
-# Trackpad mode and pointer behaviour
+# Capture enablement and guide visibility
 
-Control touch capture and pointer hiding with ``TrackpadMode``.
-
-`.inactive` disables capture. `.active(hidesPointer: false)` enables capture with standard pointer behaviour. `.active(hidesPointer: true)` also engages pointer hiding and locking, with restoration when the mode ends or the application loses focus.
-
-## Usage
+Lilypad accepts independent Boolean values for capture and guide presentation. The consuming application owns any drawing-mode state, visibility policy and pointer behaviour.
 
 ```swift
 @State private var capturesTouches = false
 
 var body: some View {
   MyInputSurface()
-    .trackpadTouches(
-      mode: capturesTouches ? .active(hidesPointer: true) : .inactive
-    ) { touches, mappedRect in
+    .trackpadTouches(isEnabled: capturesTouches) { touches, mappedRect in
       // Process input.
     }
-    .trackpadGuideVisibility(.drawingMode)
+    .trackpadGuideVisibility(capturesTouches)
     .toolbar {
       Toggle("Capture touches", isOn: $capturesTouches)
     }
 }
 ```
 
-The internal `TrackpadModeModifier` connects pointer management to the capture view's lifecycle. Clients pass a mode to `.trackpadTouches(...)`; no separate `.trackpadMode(...)` modifier is required.
+Passing `capturesTouches` to both modifiers shows the guide only while capture is enabled. Pass `true` to show the guide even when capture is disabled, or `false` to hide it. Guide visibility does not affect touch callbacks. Both settings default to `true`.
