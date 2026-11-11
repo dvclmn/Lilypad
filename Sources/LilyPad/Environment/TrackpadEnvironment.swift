@@ -10,6 +10,7 @@ import SwiftUI
 extension EnvironmentValues {
   /// Whether Lilypad displays the trackpad mapping guide, independently of capture.
   @Entry public var showsTrackpadGuide: Bool = true
+  @Entry public var trackpadGuideConfiguration: TrackpadGuideConfiguration = .init()
 
   /// Whether explicit `TouchIndicatorsView` instances display mapped touches.
   @Entry public var showsTrackpadTouchIndicators: Bool = true
