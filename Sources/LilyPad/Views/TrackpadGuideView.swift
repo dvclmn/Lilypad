@@ -25,7 +25,10 @@ public struct TrackpadGuideView: View {
 
   public var body: some View {
     if isVisible {
-      RoundedRectangle(cornerRadius: configuration.rounding)
+      let outline = RoundedRectangle(cornerRadius: configuration.rounding)
+      let dimming = min(1, max(0, configuration.dimming))
+
+      outline
         .strokeBorder(
           configuration.strokeColor,
           lineWidth: configuration.strokeWidth,
@@ -39,6 +42,26 @@ public struct TrackpadGuideView: View {
           x: mapping.mappedRect.midX,
           y: mapping.mappedRect.midY
         )
+        .background {
+          if dimming > 0 {
+            Canvas { context, size in
+              let bounds = CGRect(origin: .zero, size: size)
+              let inset = configuration.inset
+              let opening = mapping.mappedRect.insetBy(dx: inset, dy: inset)
+              var path = Path(bounds)
+              if !opening.isEmpty {
+                path.addPath(outline.path(in: opening))
+              }
+              // The even-odd rule leaves the rounded opening transparent.
+              context.fill(
+                path,
+                with: .color(.black.opacity(Double(dimming))),
+                style: FillStyle(eoFill: true)
+              )
+            }
+            .clipped()
+          }
+        }
         .allowsHitTesting(false)
     }
   }
