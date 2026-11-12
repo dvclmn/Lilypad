@@ -11,6 +11,10 @@ import SwiftUI
 /// Place in the destination coordinate space. Visibility does not affect capture.
 public struct TrackpadGuideView: View {
 
+  private enum CoordinateSpace {
+    case viewport
+  }
+
   @Environment(\.showsTrackpadGuide) private var isVisible
   public let mapping: TrackpadMapping
   let configuration: TrackpadGuideConfiguration
@@ -30,7 +34,9 @@ public struct TrackpadGuideView: View {
 
       outline
         .strokeBorder(
-          configuration.strokeColor,
+          // TODO: Hard-coded colour for now, consider moving to config
+          Color.gray.opacity(0.15),
+//          configuration.strokeColor,
           lineWidth: configuration.strokeWidth,
         )
         .padding(configuration.inset)
@@ -44,24 +50,32 @@ public struct TrackpadGuideView: View {
         )
         .background {
           if dimming > 0 {
-            Canvas { context, size in
-              let bounds = CGRect(origin: .zero, size: size)
+            GeometryReader { geometry in
+              let origin = geometry.frame(in: .named(CoordinateSpace.viewport)).origin
               let inset = configuration.inset
+              // The fill can start outside the viewport. Keep the opening aligned
+              // with the border by translating it into the fill's coordinates.
               let opening = mapping.mappedRect.insetBy(dx: inset, dy: inset)
-              var path = Path(bounds)
-              if !opening.isEmpty {
-                path.addPath(outline.path(in: opening))
+                .offsetBy(dx: -origin.x, dy: -origin.y)
+
+              Canvas { context, size in
+                var path = Path(CGRect(origin: .zero, size: size))
+                if !opening.isEmpty {
+                  path.addPath(outline.path(in: opening))
+                }
+                // The even-odd rule leaves the rounded opening transparent.
+                context.fill(
+                  path,
+                  with: .color(.black.opacity(Double(dimming))),
+                  style: FillStyle(eoFill: true)
+                )
               }
-              // The even-odd rule leaves the rounded opening transparent.
-              context.fill(
-                path,
-                with: .color(.black.opacity(Double(dimming))),
-                style: FillStyle(eoFill: true)
-              )
+              .clipped()
             }
-            .clipped()
+            .ignoresSafeArea(.container, edges: configuration.dimmingSafeAreaEdges)
           }
         }
+        .coordinateSpace(.named(CoordinateSpace.viewport))
         .allowsHitTesting(false)
     }
   }
