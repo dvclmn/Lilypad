@@ -17,7 +17,7 @@ public struct TrackpadGuideConfiguration {
     inset: CGFloat = 8,
     rounding: CGFloat = 12,
     strokeWidth: CGFloat = 2,
-    strokeColor: Color = Color.gray.opacity(0.2)
+    strokeColor: Color = Color.gray.opacity(0.15)
   ) {
     self.inset = inset
     self.rounding = rounding

@@ -26,8 +26,7 @@ public struct TrackpadGuideView: View {
   public var body: some View {
     if isVisible {
       RoundedRectangle(cornerRadius: configuration.rounding)
-        .fill(.clear)
-        .stroke(
+        .strokeBorder(
           configuration.strokeColor,
           lineWidth: configuration.strokeWidth,
         )

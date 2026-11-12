@@ -27,6 +27,11 @@ public enum TouchMapping: String, Equatable, Codable, Sendable, CaseIterable, Id
   public var id: String { rawValue }
 }
 
+extension TouchMapping {
+  public var displayName: String {
+    rawValue.capitalized
+  }
+}
 extension TouchMapping: CustomStringConvertible {
-  public var description: String { rawValue.capitalized }
+  public var description: String { displayName }
 }
