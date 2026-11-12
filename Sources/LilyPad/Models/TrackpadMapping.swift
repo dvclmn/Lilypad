@@ -90,8 +90,11 @@ public struct TrackpadMapping: Equatable, Sendable {
   }
 
   public func map(_ touch: TouchPoint) -> MappedTouchPoint {
-    MappedTouchPoint(source: touch, position: position(from: touch.position),
-                     velocity: velocity(from: touch.velocity))
+    MappedTouchPoint(
+      source: touch,
+      position: position(from: touch.position),
+      velocity: velocity(from: touch.velocity)
+    )
   }
 
 }
