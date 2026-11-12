@@ -16,13 +16,17 @@ public struct TrackpadGuideView: View {
   }
 
   @Environment(\.showsTrackpadGuide) private var isVisible
+
+  let dimmingIgnoringSafeAreaEdges: Edge.Set
   public let mapping: TrackpadMapping
   let configuration: TrackpadGuideConfiguration
 
   public init(
+    dimmingIgnoringSafeAreaEdges: Edge.Set = [],
     mapping: TrackpadMapping,
-    configuration: TrackpadGuideConfiguration
+    configuration: TrackpadGuideConfiguration,
   ) {
+    self.dimmingIgnoringSafeAreaEdges = dimmingIgnoringSafeAreaEdges
     self.mapping = mapping
     self.configuration = configuration
   }
@@ -36,7 +40,7 @@ public struct TrackpadGuideView: View {
         .strokeBorder(
           // TODO: Hard-coded colour for now, consider moving to config
           Color.gray.opacity(0.15),
-//          configuration.strokeColor,
+          //          configuration.strokeColor,
           lineWidth: configuration.strokeWidth,
         )
         .padding(configuration.inset)
@@ -46,7 +50,7 @@ public struct TrackpadGuideView: View {
         )
         .position(
           x: mapping.mappedRect.midX,
-          y: mapping.mappedRect.midY
+          y: mapping.mappedRect.midY,
         )
         .background {
           if dimming > 0 {
@@ -67,12 +71,12 @@ public struct TrackpadGuideView: View {
                 context.fill(
                   path,
                   with: .color(.black.opacity(Double(dimming))),
-                  style: FillStyle(eoFill: true)
+                  style: FillStyle(eoFill: true),
                 )
               }
               .clipped()
             }
-            .ignoresSafeArea(.container, edges: configuration.dimmingSafeAreaEdges)
+            .ignoresSafeArea(.container, edges: dimmingIgnoringSafeAreaEdges)
           }
         }
         .coordinateSpace(.named(CoordinateSpace.viewport))
