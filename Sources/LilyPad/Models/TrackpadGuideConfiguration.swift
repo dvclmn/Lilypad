@@ -8,10 +8,10 @@
 import SwiftUI
 
 public struct TrackpadGuideConfiguration: Codable, Sendable, Equatable {
-  let inset: CGFloat
-  let rounding: CGFloat
-  let strokeWidth: CGFloat
-  let dimming: CGFloat
+  public var inset: CGFloat
+  public var rounding: CGFloat
+  public var strokeWidth: CGFloat
+  public var dimming: CGFloat
 
   /// - Parameters:
   ///   - dimming: The opacity of the black fill outside the guide, clamped to `0...1`.
@@ -19,7 +19,7 @@ public struct TrackpadGuideConfiguration: Codable, Sendable, Equatable {
     inset: CGFloat = 8,
     rounding: CGFloat = 12,
     strokeWidth: CGFloat = 2,
-    dimming: CGFloat = 0,
+    dimming: CGFloat = 0.2,
   ) {
     self.inset = inset
     self.rounding = rounding
